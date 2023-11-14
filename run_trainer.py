@@ -11,7 +11,7 @@ import time
 def main(rank, config):
     begin = time.time()
     trainer = Trainer(rank, config)
-    trainer.train_loop()
+    trainer.train_loop(config)
     print("Time cost : ",time.time()-begin)
 
 if __name__ == "__main__":

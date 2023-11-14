@@ -3,9 +3,9 @@ import torch
 from torch import nn
 from time import time
 from tqdm import tqdm
-from core.data import get_dataloader
+from core.data import get_dataloader, DataManager
 from core.utils import init_seed, AverageMeter, get_instance, GradualWarmupScheduler, count_parameters
-from core.model.buffer import *
+from core.model.replay import *
 import core.model as arch
 from core.model.buffer import *
 from torch.utils.data import DataLoader
@@ -212,13 +212,18 @@ class Trainer(object):
 
         return buffer
 
-    def train_loop(self,):
+    def train_loop(self,args):
         """
         The norm train loop:  before_task, train, test, after_task
         """
         experiment_begin = time()
         for task_idx in range(self.task_num):
             print("================Task {} Start!================".format(task_idx))
+            if (isinstance(self.model, FOSTER)):
+                self.model.incremental_train(self.data_manager)
+                cnn_accy, nme_accy = self.model.eval_task()
+                self.model.after_task()
+                continue
             if hasattr(self.model, 'before_task'):
                 self.model.before_task(task_idx, self.buffer, self.train_loader.get_loader(task_idx), self.test_loader.get_loader(task_idx))
             

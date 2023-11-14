@@ -9,7 +9,7 @@ data_root: /home/xiongyakun/cifar10
 image_size: 32
   
 save_path: ./
-# data
+# data required
 init_cls_num: 2
 inc_cls_num: 2
 task_num: 5
