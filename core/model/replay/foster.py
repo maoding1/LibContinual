@@ -223,7 +223,7 @@ class FOSTER(Finetune):
         self._network.eval()
 
     def parameters(self) :
-        return self._network.parameters()
+        return [p for p in self._network.parameters() if p.requires_grad == True]
 
 
     def _feature_compression(self, train_loader, test_loader):
