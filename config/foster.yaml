@@ -1,33 +1,72 @@
-prefix: "cil"
-dataset: "cifar100"
-memory_size: 2000
-memory_per_class: 20
-fixed_memory: true
-shuffle: true
-init_cls: 50
-increment: 10
-model_name: "foster"
-convnet_type: "resnet32"
+includes:
+  - headers/device.yaml
+# dataset: "cifar100"
+save_path: ./
+data_root: /root/autodl-tmp/cifar100
+
+init_cls_num: 50
+inc_cls_num: 10
+total_cls_num: 100
+task_num: 6
+init_epoch: 200
+val_per_epoch: 10
+epoch: 170 # stands for boosting_epochs
+init_lr: 0.1
+init_weight_decay: 5e-4
+
+# model_name: "foster"
+# convnet_type: "resnet32"
+warmup: 0
 
 device_ids: 0
 n_gpu: 1
-seed: 1993
+
 deterministic: True
 
-beta1: 0.96
-beta2: 0.97
-oofc: "ft"
-is_teacher_wa: false
-is_student_wa: false
-lambda_okd: 1
-wa_value: 1
-init_epochs: 200
-init_lr: 0.1
-init_weight_decay: 5e-4
-boosting_epochs: 170
-compression_epochs: 130
-lr: 0.1
+backbone:
+  name: resnet32
+  kwargs: ~
+
+classifier:
+  name: FOSTER
+  kwargs:
+    num_class: 100
+    feat_dim: 64
+    beta1: 0.94
+    beta2: 0.97
+    is_teacher_wa: false
+    is_student_wa: false
+    lambda_okd: 1
+    wa_value: 1
+    oofc: "ft"
+    convnet_type: "resnet32"
+    T: 2
+    fixed_memory: True
+    memory_per_class: 20
+
+    lr: 0.1
+    compression_epochs: 130
+
+
 batch_size: 128
-weight_decay: 5e-4
 num_workers: 8
-T: 2
+
+
+buffer:
+  name: LinearBuffer
+  kwargs:
+    buffer_size: 500
+    batch_size: 32       # has no effect on LinearBuffer
+    strategy: foster    # random, equal_random, reservoir, herding
+
+optimizer:
+  name: SGD
+  kwargs:
+    lr: 0.1
+    momentum: 0.9
+    weight_decay: 5e-4
+
+lr_scheduler:
+  name: CosineAnnealingLR
+  kwargs:
+    T_max: 170

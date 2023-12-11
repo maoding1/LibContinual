@@ -80,8 +80,9 @@ def get_instance(module, name, config, **kwargs):
     """
     if config[name]["kwargs"] is not None:
         kwargs.update(config[name]["kwargs"])
-    if name == "classifier" and config[name]["name"] == "foster":
-        return getattr(module, "FOSTER")(config)
+    #foster special managed
+    #if name == "classifier" and config[name]["name"] == "foster":
+    #   return getattr(module, "FOSTER")(config)
     
     return getattr(module, config[name]["name"])(**kwargs)
 

@@ -1,0 +1,3529 @@
+{'data_root': '/root/autodl-tmp/cifar100', 'image_size': 32, 'pin_memory': False, 'augment': True, 'workers': 8, 'device_ids': 0, 'n_gpu': 1, 'seed': 1993, 'deterministic': True, 'epoch': 170, 'batch_size': 128, 'val_per_epoch': 10, 'optimzer': {'name': 'SGD', 'kwargs': {'lr': 0.1}}, 'lr_scheduler': {'name': 'CosineAnnealingLR', 'kwargs': {'T_max': 170}}, 'warmup': 0, 'includes': ['headers/device.yaml'], 'save_path': './', 'init_cls_num': 50, 'inc_cls_num': 10, 'total_cls_num': 100, 'task_num': 6, 'init_epoch': 200, 'init_lr': 0.1, 'init_weight_decay': 0.0005, 'backbone': {'name': 'resnet32', 'kwargs': None}, 'classifier': {'name': 'FOSTER', 'kwargs': {'num_class': 100, 'feat_dim': 64, 'beta1': 0.94, 'beta2': 0.97, 'is_teacher_wa': False, 'is_student_wa': False, 'lambda_okd': 1, 'wa_value': 1, 'oofc': 'ft', 'convnet_type': 'resnet32', 'T': 2, 'fixed_memory': True, 'memory_per_class': 20, 'lr': 0.1, 'compression_epochs': 130}}, 'num_workers': 8, 'buffer': {'name': 'LinearBuffer', 'kwargs': {'buffer_size': 500, 'batch_size': 32, 'strategy': 'foster'}}, 'optimizer': {'name': 'SGD', 'kwargs': {'lr': 0.1, 'momentum': 0.9, 'weight_decay': 0.0005}}, 'rank': 0}
+FOSTER(
+  (backbone): CifarResNet(
+    (conv_1_3x3): Conv2d(3, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+    (bn_1): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (stage_1): Sequential(
+      (0): ResNetBasicblock(
+        (conv_a): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (1): ResNetBasicblock(
+        (conv_a): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): ResNetBasicblock(
+        (conv_a): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): ResNetBasicblock(
+        (conv_a): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): ResNetBasicblock(
+        (conv_a): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(16, 16, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(16, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (stage_2): Sequential(
+      (0): ResNetBasicblock(
+        (conv_a): Conv2d(16, 32, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): DownsampleA(
+          (avg): AvgPool2d(kernel_size=1, stride=2, padding=0)
+        )
+      )
+      (1): ResNetBasicblock(
+        (conv_a): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): ResNetBasicblock(
+        (conv_a): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): ResNetBasicblock(
+        (conv_a): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): ResNetBasicblock(
+        (conv_a): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(32, 32, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(32, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (stage_3): Sequential(
+      (0): ResNetBasicblock(
+        (conv_a): Conv2d(32, 64, kernel_size=(3, 3), stride=(2, 2), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (downsample): DownsampleA(
+          (avg): AvgPool2d(kernel_size=1, stride=2, padding=0)
+        )
+      )
+      (1): ResNetBasicblock(
+        (conv_a): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (2): ResNetBasicblock(
+        (conv_a): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (3): ResNetBasicblock(
+        (conv_a): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+      (4): ResNetBasicblock(
+        (conv_a): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_a): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+        (conv_b): Conv2d(64, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        (bn_b): BatchNorm2d(64, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+      )
+    )
+    (avgpool): AvgPool2d(kernel_size=8, stride=8, padding=0)
+    (fc): Linear(in_features=64, out_features=10, bias=True)
+  )
+  (classifier): Linear(in_features=64, out_features=100, bias=True)
+  (loss_fn): CrossEntropyLoss()
+  (_network): FOSTERNet(
+    (convnets): ModuleList()
+  )
+)
+Trainable params in the model: 0
+================Task 0 Start!================
+Trainable params in the model: 0
+Learning on 0-50
+SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    maximize: False
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0005
+)
+================Task 0 Training!================
+The training samples number: 25000
+learning rate: [0.1]
+================ Train on the train set ================
+Epoch [0/200] |	Loss: 3.856 	Average Acc: 4.072 
+learning rate: [0.09999383162408304]
+================ Train on the train set ================
+Epoch [1/200] |	Loss: 3.297 	Average Acc: 13.264 
+learning rate: [0.09997532801828658]
+================ Train on the train set ================
+Epoch [2/200] |	Loss: 2.954 	Average Acc: 21.015 
+learning rate: [0.09994449374809851]
+================ Train on the train set ================
+Epoch [3/200] |	Loss: 2.717 	Average Acc: 26.104 
+learning rate: [0.09990133642141359]
+================ Train on the train set ================
+Epoch [4/200] |	Loss: 2.560 	Average Acc: 29.742 
+learning rate: [0.09984586668665642]
+================ Train on the train set ================
+Epoch [5/200] |	Loss: 2.392 	Average Acc: 33.379 
+learning rate: [0.09977809823015402]
+================ Train on the train set ================
+Epoch [6/200] |	Loss: 2.271 	Average Acc: 36.252 
+learning rate: [0.09969804777275901]
+================ Train on the train set ================
+Epoch [7/200] |	Loss: 2.194 	Average Acc: 38.396 
+learning rate: [0.09960573506572391]
+================ Train on the train set ================
+Epoch [8/200] |	Loss: 2.111 	Average Acc: 40.589 
+learning rate: [0.09950118288582789]
+================ Train on the train set ================
+Epoch [9/200] |	Loss: 2.067 	Average Acc: 42.321 
+================ Test on the test set ================
+ * Average Acc: 38.700 Best acc 38.700
+ Per-Task Acc:[38.7]
+learning rate: [0.09938441702975691]
+================ Train on the train set ================
+Epoch [10/200] |	Loss: 2.015 	Average Acc: 43.294 
+learning rate: [0.09925546630773871]
+================ Train on the train set ================
+Epoch [11/200] |	Loss: 1.988 	Average Acc: 44.166 
+learning rate: [0.09911436253643445]
+================ Train on the train set ================
+Epoch [12/200] |	Loss: 1.963 	Average Acc: 44.342 
+learning rate: [0.0989611405310883]
+================ Train on the train set ================
+Epoch [13/200] |	Loss: 1.927 	Average Acc: 45.387 
+learning rate: [0.09879583809693739]
+================ Train on the train set ================
+Epoch [14/200] |	Loss: 1.884 	Average Acc: 46.615 
+learning rate: [0.09861849601988384]
+================ Train on the train set ================
+Epoch [15/200] |	Loss: 1.849 	Average Acc: 47.415 
+learning rate: [0.09842915805643157]
+================ Train on the train set ================
+Epoch [16/200] |	Loss: 1.835 	Average Acc: 47.759 
+learning rate: [0.09822787092288993]
+================ Train on the train set ================
+Epoch [17/200] |	Loss: 1.813 	Average Acc: 48.192 
+learning rate: [0.09801468428384717]
+================ Train on the train set ================
+Epoch [18/200] |	Loss: 1.773 	Average Acc: 49.460 
+learning rate: [0.09778965073991652]
+================ Train on the train set ================
+Epoch [19/200] |	Loss: 1.760 	Average Acc: 49.404 
+================ Test on the test set ================
+ * Average Acc: 46.350 Best acc 46.350
+ Per-Task Acc:[46.35]
+learning rate: [0.0975528258147577]
+================ Train on the train set ================
+Epoch [20/200] |	Loss: 1.754 	Average Acc: 49.636 
+learning rate: [0.09730426794137728]
+================ Train on the train set ================
+Epoch [21/200] |	Loss: 1.736 	Average Acc: 50.156 
+learning rate: [0.09704403844771128]
+================ Train on the train set ================
+Epoch [22/200] |	Loss: 1.731 	Average Acc: 50.456 
+learning rate: [0.09677220154149338]
+================ Train on the train set ================
+Epoch [23/200] |	Loss: 1.705 	Average Acc: 51.132 
+learning rate: [0.09648882429441258]
+================ Train on the train set ================
+Epoch [24/200] |	Loss: 1.692 	Average Acc: 51.357 
+learning rate: [0.09619397662556435]
+================ Train on the train set ================
+Epoch [25/200] |	Loss: 1.688 	Average Acc: 51.496 
+learning rate: [0.09588773128419906]
+================ Train on the train set ================
+Epoch [26/200] |	Loss: 1.682 	Average Acc: 51.493 
+learning rate: [0.09557016383177226]
+================ Train on the train set ================
+Epoch [27/200] |	Loss: 1.679 	Average Acc: 51.488 
+learning rate: [0.09524135262330098]
+================ Train on the train set ================
+Epoch [28/200] |	Loss: 1.662 	Average Acc: 52.445 
+learning rate: [0.09490137878803079]
+================ Train on the train set ================
+Epoch [29/200] |	Loss: 1.664 	Average Acc: 52.072 
+================ Test on the test set ================
+ * Average Acc: 51.020 Best acc 51.020
+ Per-Task Acc:[51.02]
+learning rate: [0.0945503262094184]
+================ Train on the train set ================
+Epoch [30/200] |	Loss: 1.651 	Average Acc: 52.365 
+learning rate: [0.0941882815044347]
+================ Train on the train set ================
+Epoch [31/200] |	Loss: 1.648 	Average Acc: 52.797 
+learning rate: [0.09381533400219319]
+================ Train on the train set ================
+Epoch [32/200] |	Loss: 1.634 	Average Acc: 52.933 
+learning rate: [0.09343157572190958]
+================ Train on the train set ================
+Epoch [33/200] |	Loss: 1.631 	Average Acc: 52.797 
+learning rate: [0.0930371013501972]
+================ Train on the train set ================
+Epoch [34/200] |	Loss: 1.620 	Average Acc: 53.145 
+learning rate: [0.09263200821770463]
+================ Train on the train set ================
+Epoch [35/200] |	Loss: 1.624 	Average Acc: 53.057 
+learning rate: [0.09221639627510078]
+================ Train on the train set ================
+Epoch [36/200] |	Loss: 1.615 	Average Acc: 53.177 
+learning rate: [0.09179036806841355]
+================ Train on the train set ================
+Epoch [37/200] |	Loss: 1.607 	Average Acc: 53.609 
+learning rate: [0.09135402871372812]
+================ Train on the train set ================
+Epoch [38/200] |	Loss: 1.615 	Average Acc: 53.373 
+learning rate: [0.0909074858712512]
+================ Train on the train set ================
+Epoch [39/200] |	Loss: 1.607 	Average Acc: 53.797 
+================ Test on the test set ================
+ * Average Acc: 51.700 Best acc 51.700
+ Per-Task Acc:[51.7]
+learning rate: [0.09045084971874741]
+================ Train on the train set ================
+Epoch [40/200] |	Loss: 1.598 	Average Acc: 53.749 
+learning rate: [0.08998423292435458]
+================ Train on the train set ================
+Epoch [41/200] |	Loss: 1.595 	Average Acc: 53.705 
+learning rate: [0.08950775061878455]
+================ Train on the train set ================
+Epoch [42/200] |	Loss: 1.597 	Average Acc: 53.817 
+learning rate: [0.08902152036691653]
+================ Train on the train set ================
+Epoch [43/200] |	Loss: 1.580 	Average Acc: 54.402 
+learning rate: [0.08852566213878951]
+================ Train on the train set ================
+Epoch [44/200] |	Loss: 1.580 	Average Acc: 54.481 
+learning rate: [0.0880202982800016]
+================ Train on the train set ================
+Epoch [45/200] |	Loss: 1.580 	Average Acc: 54.690 
+learning rate: [0.08750555348152303]
+================ Train on the train set ================
+Epoch [46/200] |	Loss: 1.566 	Average Acc: 54.810 
+learning rate: [0.08698155474893052]
+================ Train on the train set ================
+Epoch [47/200] |	Loss: 1.560 	Average Acc: 54.777 
+learning rate: [0.08644843137107061]
+================ Train on the train set ================
+Epoch [48/200] |	Loss: 1.565 	Average Acc: 54.785 
+learning rate: [0.08590631488815947]
+================ Train on the train set ================
+Epoch [49/200] |	Loss: 1.551 	Average Acc: 54.966 
+================ Test on the test set ================
+ * Average Acc: 46.370 Best acc 51.700
+ Per-Task Acc:[46.37]
+learning rate: [0.0853553390593274]
+================ Train on the train set ================
+Epoch [50/200] |	Loss: 1.548 	Average Acc: 55.182 
+learning rate: [0.08479563982961574]
+================ Train on the train set ================
+Epoch [51/200] |	Loss: 1.549 	Average Acc: 55.606 
+learning rate: [0.08422735529643446]
+================ Train on the train set ================
+Epoch [52/200] |	Loss: 1.543 	Average Acc: 55.350 
+learning rate: [0.08365062567548869]
+================ Train on the train set ================
+Epoch [53/200] |	Loss: 1.547 	Average Acc: 54.593 
+learning rate: [0.08306559326618261]
+================ Train on the train set ================
+Epoch [54/200] |	Loss: 1.532 	Average Acc: 55.826 
+learning rate: [0.0824724024165092]
+================ Train on the train set ================
+Epoch [55/200] |	Loss: 1.540 	Average Acc: 55.158 
+learning rate: [0.0818711994874345]
+================ Train on the train set ================
+Epoch [56/200] |	Loss: 1.520 	Average Acc: 55.902 
+learning rate: [0.08126213281678528]
+================ Train on the train set ================
+Epoch [57/200] |	Loss: 1.532 	Average Acc: 55.270 
+learning rate: [0.08064535268264884]
+================ Train on the train set ================
+Epoch [58/200] |	Loss: 1.518 	Average Acc: 55.706 
+learning rate: [0.08002101126629421]
+================ Train on the train set ================
+Epoch [59/200] |	Loss: 1.509 	Average Acc: 56.146 
+================ Test on the test set ================
+ * Average Acc: 57.250 Best acc 57.250
+ Per-Task Acc:[57.25]
+learning rate: [0.07938926261462367]
+================ Train on the train set ================
+Epoch [60/200] |	Loss: 1.506 	Average Acc: 56.546 
+learning rate: [0.07875026260216395]
+================ Train on the train set ================
+Epoch [61/200] |	Loss: 1.503 	Average Acc: 56.322 
+learning rate: [0.07810416889260656]
+================ Train on the train set ================
+Epoch [62/200] |	Loss: 1.492 	Average Acc: 56.878 
+learning rate: [0.07745114089990661]
+================ Train on the train set ================
+Epoch [63/200] |	Loss: 1.500 	Average Acc: 56.442 
+learning rate: [0.07679133974894985]
+================ Train on the train set ================
+Epoch [64/200] |	Loss: 1.488 	Average Acc: 56.518 
+learning rate: [0.07612492823579746]
+================ Train on the train set ================
+Epoch [65/200] |	Loss: 1.485 	Average Acc: 56.978 
+learning rate: [0.07545207078751859]
+================ Train on the train set ================
+Epoch [66/200] |	Loss: 1.485 	Average Acc: 56.786 
+learning rate: [0.0747729334216204]
+================ Train on the train set ================
+Epoch [67/200] |	Loss: 1.475 	Average Acc: 56.974 
+learning rate: [0.07408768370508578]
+================ Train on the train set ================
+Epoch [68/200] |	Loss: 1.459 	Average Acc: 57.618 
+learning rate: [0.0733964907130287]
+================ Train on the train set ================
+Epoch [69/200] |	Loss: 1.457 	Average Acc: 57.623 
+================ Test on the test set ================
+ * Average Acc: 43.370 Best acc 57.250
+ Per-Task Acc:[43.37]
+learning rate: [0.07269952498697736]
+================ Train on the train set ================
+Epoch [70/200] |	Loss: 1.464 	Average Acc: 57.306 
+learning rate: [0.07199695849279578]
+================ Train on the train set ================
+Epoch [71/200] |	Loss: 1.449 	Average Acc: 57.775 
+learning rate: [0.07128896457825366]
+================ Train on the train set ================
+Epoch [72/200] |	Loss: 1.452 	Average Acc: 57.690 
+learning rate: [0.07057571793025548]
+================ Train on the train set ================
+Epoch [73/200] |	Loss: 1.448 	Average Acc: 57.430 
+learning rate: [0.06985739453173906]
+================ Train on the train set ================
+Epoch [74/200] |	Loss: 1.446 	Average Acc: 58.267 
+learning rate: [0.06913417161825453]
+================ Train on the train set ================
+Epoch [75/200] |	Loss: 1.431 	Average Acc: 58.087 
+learning rate: [0.06840622763423394]
+================ Train on the train set ================
+Epoch [76/200] |	Loss: 1.414 	Average Acc: 58.671 
+learning rate: [0.0676737421889629]
+================ Train on the train set ================
+Epoch [77/200] |	Loss: 1.417 	Average Acc: 58.539 
+learning rate: [0.06693689601226462]
+================ Train on the train set ================
+Epoch [78/200] |	Loss: 1.408 	Average Acc: 58.639 
+learning rate: [0.06619587090990751]
+================ Train on the train set ================
+Epoch [79/200] |	Loss: 1.407 	Average Acc: 58.703 
+================ Test on the test set ================
+ * Average Acc: 56.450 Best acc 57.250
+ Per-Task Acc:[56.45]
+learning rate: [0.06545084971874741]
+================ Train on the train set ================
+Epoch [80/200] |	Loss: 1.403 	Average Acc: 58.959 
+learning rate: [0.06470201626161524]
+================ Train on the train set ================
+Epoch [81/200] |	Loss: 1.393 	Average Acc: 58.763 
+learning rate: [0.06394955530196152]
+================ Train on the train set ================
+Epoch [82/200] |	Loss: 1.392 	Average Acc: 59.231 
+learning rate: [0.06319365249826868]
+================ Train on the train set ================
+Epoch [83/200] |	Loss: 1.382 	Average Acc: 59.891 
+learning rate: [0.06243449435824277]
+================ Train on the train set ================
+Epoch [84/200] |	Loss: 1.375 	Average Acc: 59.847 
+learning rate: [0.06167226819279532]
+================ Train on the train set ================
+Epoch [85/200] |	Loss: 1.378 	Average Acc: 59.543 
+learning rate: [0.06090716206982718]
+================ Train on the train set ================
+Epoch [86/200] |	Loss: 1.358 	Average Acc: 60.379 
+learning rate: [0.06013936476782568]
+================ Train on the train set ================
+Epoch [87/200] |	Loss: 1.357 	Average Acc: 60.355 
+learning rate: [0.05936906572928629]
+================ Train on the train set ================
+Epoch [88/200] |	Loss: 1.348 	Average Acc: 60.263 
+learning rate: [0.05859645501397052]
+================ Train on the train set ================
+Epoch [89/200] |	Loss: 1.339 	Average Acc: 60.800 
+================ Test on the test set ================
+ * Average Acc: 53.430 Best acc 57.250
+ Per-Task Acc:[53.43]
+learning rate: [0.05782172325201159]
+================ Train on the train set ================
+Epoch [90/200] |	Loss: 1.342 	Average Acc: 60.403 
+learning rate: [0.057045061596879186]
+================ Train on the train set ================
+Epoch [91/200] |	Loss: 1.329 	Average Acc: 60.727 
+learning rate: [0.056266661678215264]
+================ Train on the train set ================
+Epoch [92/200] |	Loss: 1.327 	Average Acc: 60.948 
+learning rate: [0.055486715554552306]
+================ Train on the train set ================
+Epoch [93/200] |	Loss: 1.312 	Average Acc: 61.496 
+learning rate: [0.05470541566592575]
+================ Train on the train set ================
+Epoch [94/200] |	Loss: 1.316 	Average Acc: 61.195 
+learning rate: [0.05392295478639229]
+================ Train on the train set ================
+Epoch [95/200] |	Loss: 1.303 	Average Acc: 61.564 
+learning rate: [0.05313952597646571]
+================ Train on the train set ================
+Epoch [96/200] |	Loss: 1.298 	Average Acc: 62.192 
+learning rate: [0.05235532253548216]
+================ Train on the train set ================
+Epoch [97/200] |	Loss: 1.285 	Average Acc: 62.092 
+learning rate: [0.051570537953906447]
+================ Train on the train set ================
+Epoch [98/200] |	Loss: 1.271 	Average Acc: 62.908 
+learning rate: [0.05078536586559106]
+================ Train on the train set ================
+Epoch [99/200] |	Loss: 1.271 	Average Acc: 62.496 
+================ Test on the test set ================
+ * Average Acc: 51.220 Best acc 57.250
+ Per-Task Acc:[51.22]
+learning rate: [0.050000000000000024]
+================ Train on the train set ================
+Epoch [100/200] |	Loss: 1.276 	Average Acc: 62.352 
+learning rate: [0.049214634134409]
+================ Train on the train set ================
+Epoch [101/200] |	Loss: 1.264 	Average Acc: 62.920 
+learning rate: [0.04842946204609361]
+================ Train on the train set ================
+Epoch [102/200] |	Loss: 1.254 	Average Acc: 62.988 
+learning rate: [0.04764467746451789]
+================ Train on the train set ================
+Epoch [103/200] |	Loss: 1.249 	Average Acc: 63.000 
+learning rate: [0.046860474023534354]
+================ Train on the train set ================
+Epoch [104/200] |	Loss: 1.244 	Average Acc: 62.764 
+learning rate: [0.04607704521360778]
+================ Train on the train set ================
+Epoch [105/200] |	Loss: 1.217 	Average Acc: 63.888 
+learning rate: [0.04529458433407431]
+================ Train on the train set ================
+Epoch [106/200] |	Loss: 1.223 	Average Acc: 63.884 
+learning rate: [0.04451328444544776]
+================ Train on the train set ================
+Epoch [107/200] |	Loss: 1.211 	Average Acc: 64.173 
+learning rate: [0.04373333832178482]
+================ Train on the train set ================
+Epoch [108/200] |	Loss: 1.209 	Average Acc: 63.889 
+learning rate: [0.0429549384031209]
+================ Train on the train set ================
+Epoch [109/200] |	Loss: 1.192 	Average Acc: 64.541 
+================ Test on the test set ================
+ * Average Acc: 58.990 Best acc 58.990
+ Per-Task Acc:[58.99]
+learning rate: [0.042178276747988484]
+================ Train on the train set ================
+Epoch [110/200] |	Loss: 1.187 	Average Acc: 64.953 
+learning rate: [0.04140354498602954]
+================ Train on the train set ================
+Epoch [111/200] |	Loss: 1.184 	Average Acc: 65.017 
+learning rate: [0.0406309342707138]
+================ Train on the train set ================
+Epoch [112/200] |	Loss: 1.162 	Average Acc: 65.473 
+learning rate: [0.03986063523217441]
+================ Train on the train set ================
+Epoch [113/200] |	Loss: 1.173 	Average Acc: 65.077 
+learning rate: [0.039092837930172916]
+================ Train on the train set ================
+Epoch [114/200] |	Loss: 1.145 	Average Acc: 66.009 
+learning rate: [0.03832773180720475]
+================ Train on the train set ================
+Epoch [115/200] |	Loss: 1.148 	Average Acc: 65.641 
+learning rate: [0.037565505641757285]
+================ Train on the train set ================
+Epoch [116/200] |	Loss: 1.139 	Average Acc: 65.977 
+learning rate: [0.03680634750173138]
+================ Train on the train set ================
+Epoch [117/200] |	Loss: 1.125 	Average Acc: 66.485 
+learning rate: [0.036050444698038565]
+================ Train on the train set ================
+Epoch [118/200] |	Loss: 1.113 	Average Acc: 66.842 
+learning rate: [0.03529798373838483]
+================ Train on the train set ================
+Epoch [119/200] |	Loss: 1.113 	Average Acc: 66.577 
+================ Test on the test set ================
+ * Average Acc: 61.700 Best acc 61.700
+ Per-Task Acc:[61.7]
+learning rate: [0.03454915028125267]
+================ Train on the train set ================
+Epoch [120/200] |	Loss: 1.097 	Average Acc: 67.049 
+learning rate: [0.03380412909009255]
+================ Train on the train set ================
+Epoch [121/200] |	Loss: 1.094 	Average Acc: 67.450 
+learning rate: [0.03306310398773545]
+================ Train on the train set ================
+Epoch [122/200] |	Loss: 1.086 	Average Acc: 67.217 
+learning rate: [0.03232625781103717]
+================ Train on the train set ================
+Epoch [123/200] |	Loss: 1.068 	Average Acc: 67.890 
+learning rate: [0.03159377236576613]
+================ Train on the train set ================
+Epoch [124/200] |	Loss: 1.072 	Average Acc: 67.902 
+learning rate: [0.030865828381745543]
+================ Train on the train set ================
+Epoch [125/200] |	Loss: 1.045 	Average Acc: 68.366 
+learning rate: [0.03014260546826098]
+================ Train on the train set ================
+Epoch [126/200] |	Loss: 1.041 	Average Acc: 68.606 
+learning rate: [0.02942428206974458]
+================ Train on the train set ================
+Epoch [127/200] |	Loss: 1.030 	Average Acc: 68.974 
+learning rate: [0.028711035421746387]
+================ Train on the train set ================
+Epoch [128/200] |	Loss: 1.022 	Average Acc: 69.178 
+learning rate: [0.02800304150720426]
+================ Train on the train set ================
+Epoch [129/200] |	Loss: 1.011 	Average Acc: 69.482 
+================ Test on the test set ================
+ * Average Acc: 64.360 Best acc 64.360
+ Per-Task Acc:[64.36]
+learning rate: [0.02730047501302268]
+================ Train on the train set ================
+Epoch [130/200] |	Loss: 1.010 	Average Acc: 69.654 
+learning rate: [0.026603509286971357]
+================ Train on the train set ================
+Epoch [131/200] |	Loss: 0.987 	Average Acc: 70.255 
+learning rate: [0.025912316294914244]
+================ Train on the train set ================
+Epoch [132/200] |	Loss: 0.987 	Average Acc: 69.963 
+learning rate: [0.025227066578379632]
+================ Train on the train set ================
+Epoch [133/200] |	Loss: 0.969 	Average Acc: 70.787 
+learning rate: [0.024547929212481445]
+================ Train on the train set ================
+Epoch [134/200] |	Loss: 0.961 	Average Acc: 70.687 
+learning rate: [0.02387507176420257]
+================ Train on the train set ================
+Epoch [135/200] |	Loss: 0.955 	Average Acc: 71.187 
+learning rate: [0.023208660251050166]
+================ Train on the train set ================
+Epoch [136/200] |	Loss: 0.943 	Average Acc: 71.331 
+learning rate: [0.022548859100093414]
+================ Train on the train set ================
+Epoch [137/200] |	Loss: 0.915 	Average Acc: 72.495 
+learning rate: [0.021895831107393474]
+================ Train on the train set ================
+Epoch [138/200] |	Loss: 0.913 	Average Acc: 71.815 
+learning rate: [0.02124973739783608]
+================ Train on the train set ================
+Epoch [139/200] |	Loss: 0.904 	Average Acc: 72.847 
+================ Test on the test set ================
+ * Average Acc: 63.840 Best acc 64.360
+ Per-Task Acc:[63.84]
+learning rate: [0.02061073738537636]
+================ Train on the train set ================
+Epoch [140/200] |	Loss: 0.889 	Average Acc: 73.107 
+learning rate: [0.019978988733705814]
+================ Train on the train set ================
+Epoch [141/200] |	Loss: 0.873 	Average Acc: 73.715 
+learning rate: [0.01935464731735118]
+================ Train on the train set ================
+Epoch [142/200] |	Loss: 0.861 	Average Acc: 74.228 
+learning rate: [0.018737867183214747]
+================ Train on the train set ================
+Epoch [143/200] |	Loss: 0.859 	Average Acc: 73.844 
+learning rate: [0.01812880051256552]
+================ Train on the train set ================
+Epoch [144/200] |	Loss: 0.839 	Average Acc: 74.400 
+learning rate: [0.017527597583490827]
+================ Train on the train set ================
+Epoch [145/200] |	Loss: 0.829 	Average Acc: 74.708 
+learning rate: [0.01693440673381742]
+================ Train on the train set ================
+Epoch [146/200] |	Loss: 0.817 	Average Acc: 74.976 
+learning rate: [0.016349374324511334]
+================ Train on the train set ================
+Epoch [147/200] |	Loss: 0.801 	Average Acc: 75.612 
+learning rate: [0.01577264470356557]
+================ Train on the train set ================
+Epoch [148/200] |	Loss: 0.787 	Average Acc: 76.216 
+learning rate: [0.01520436017038429]
+================ Train on the train set ================
+Epoch [149/200] |	Loss: 0.768 	Average Acc: 76.452 
+================ Test on the test set ================
+ * Average Acc: 66.650 Best acc 66.650
+ Per-Task Acc:[66.65]
+learning rate: [0.014644660940672632]
+================ Train on the train set ================
+Epoch [150/200] |	Loss: 0.760 	Average Acc: 76.681 
+learning rate: [0.01409368511184057]
+================ Train on the train set ================
+Epoch [151/200] |	Loss: 0.746 	Average Acc: 77.305 
+learning rate: [0.013551568628929438]
+================ Train on the train set ================
+Epoch [152/200] |	Loss: 0.734 	Average Acc: 77.373 
+learning rate: [0.013018445251069516]
+================ Train on the train set ================
+Epoch [153/200] |	Loss: 0.715 	Average Acc: 77.921 
+learning rate: [0.012494446518477026]
+================ Train on the train set ================
+Epoch [154/200] |	Loss: 0.701 	Average Acc: 78.373 
+learning rate: [0.011979701719998459]
+================ Train on the train set ================
+Epoch [155/200] |	Loss: 0.697 	Average Acc: 78.589 
+learning rate: [0.011474337861210548]
+================ Train on the train set ================
+Epoch [156/200] |	Loss: 0.677 	Average Acc: 78.929 
+learning rate: [0.010978479633083526]
+================ Train on the train set ================
+Epoch [157/200] |	Loss: 0.653 	Average Acc: 79.846 
+learning rate: [0.010492249381215483]
+================ Train on the train set ================
+Epoch [158/200] |	Loss: 0.640 	Average Acc: 80.170 
+learning rate: [0.010015767075645474]
+================ Train on the train set ================
+Epoch [159/200] |	Loss: 0.627 	Average Acc: 80.458 
+================ Test on the test set ================
+ * Average Acc: 70.270 Best acc 70.270
+ Per-Task Acc:[70.27]
+learning rate: [0.009549150281252637]
+================ Train on the train set ================
+Epoch [160/200] |	Loss: 0.622 	Average Acc: 80.838 
+learning rate: [0.00909251412874884]
+================ Train on the train set ================
+Epoch [161/200] |	Loss: 0.593 	Average Acc: 81.746 
+learning rate: [0.008645971286271918]
+================ Train on the train set ================
+Epoch [162/200] |	Loss: 0.577 	Average Acc: 82.226 
+learning rate: [0.008209631931586501]
+================ Train on the train set ================
+Epoch [163/200] |	Loss: 0.568 	Average Acc: 82.322 
+learning rate: [0.0077836037248992605]
+================ Train on the train set ================
+Epoch [164/200] |	Loss: 0.533 	Average Acc: 83.663 
+learning rate: [0.0073679917822954055]
+================ Train on the train set ================
+Epoch [165/200] |	Loss: 0.523 	Average Acc: 83.655 
+learning rate: [0.006962898649802815]
+================ Train on the train set ================
+Epoch [166/200] |	Loss: 0.508 	Average Acc: 84.095 
+learning rate: [0.006568424278090438]
+================ Train on the train set ================
+Epoch [167/200] |	Loss: 0.488 	Average Acc: 84.967 
+learning rate: [0.006184665997806824]
+================ Train on the train set ================
+Epoch [168/200] |	Loss: 0.473 	Average Acc: 85.407 
+learning rate: [0.00581171849556533]
+================ Train on the train set ================
+Epoch [169/200] |	Loss: 0.451 	Average Acc: 85.948 
+================ Test on the test set ================
+ * Average Acc: 72.800 Best acc 72.800
+ Per-Task Acc:[72.8]
+learning rate: [0.0054496737905816136]
+================ Train on the train set ================
+Epoch [170/200] |	Loss: 0.444 	Average Acc: 86.099 
+learning rate: [0.005098621211969226]
+================ Train on the train set ================
+Epoch [171/200] |	Loss: 0.419 	Average Acc: 86.984 
+learning rate: [0.004758647376699035]
+================ Train on the train set ================
+Epoch [172/200] |	Loss: 0.407 	Average Acc: 87.272 
+learning rate: [0.00442983616822775]
+================ Train on the train set ================
+Epoch [173/200] |	Loss: 0.388 	Average Acc: 87.964 
+learning rate: [0.004112268715800957]
+================ Train on the train set ================
+Epoch [174/200] |	Loss: 0.367 	Average Acc: 88.568 
+learning rate: [0.003806023374435677]
+================ Train on the train set ================
+Epoch [175/200] |	Loss: 0.349 	Average Acc: 89.252 
+learning rate: [0.003511175705587435]
+================ Train on the train set ================
+Epoch [176/200] |	Loss: 0.324 	Average Acc: 90.129 
+learning rate: [0.0032277984585066333]
+================ Train on the train set ================
+Epoch [177/200] |	Loss: 0.316 	Average Acc: 90.365 
+learning rate: [0.002955961552288729]
+================ Train on the train set ================
+Epoch [178/200] |	Loss: 0.291 	Average Acc: 91.277 
+learning rate: [0.0026957320586227366]
+================ Train on the train set ================
+Epoch [179/200] |	Loss: 0.277 	Average Acc: 91.705 
+================ Test on the test set ================
+ * Average Acc: 75.720 Best acc 75.720
+ Per-Task Acc:[75.72]
+learning rate: [0.002447174185242325]
+================ Train on the train set ================
+Epoch [180/200] |	Loss: 0.265 	Average Acc: 92.150 
+learning rate: [0.0022103492600834954]
+================ Train on the train set ================
+Epoch [181/200] |	Loss: 0.247 	Average Acc: 92.878 
+learning rate: [0.0019853157161528537]
+================ Train on the train set ================
+Epoch [182/200] |	Loss: 0.235 	Average Acc: 93.134 
+learning rate: [0.001772129077110103]
+================ Train on the train set ================
+Epoch [183/200] |	Loss: 0.230 	Average Acc: 93.222 
+learning rate: [0.0015708419435684529]
+================ Train on the train set ================
+Epoch [184/200] |	Loss: 0.209 	Average Acc: 93.923 
+learning rate: [0.0013815039801161732]
+================ Train on the train set ================
+Epoch [185/200] |	Loss: 0.199 	Average Acc: 94.227 
+learning rate: [0.0012041619030626347]
+================ Train on the train set ================
+Epoch [186/200] |	Loss: 0.187 	Average Acc: 94.787 
+learning rate: [0.0010388594689117077]
+================ Train on the train set ================
+Epoch [187/200] |	Loss: 0.179 	Average Acc: 95.104 
+learning rate: [0.0008856374635655645]
+================ Train on the train set ================
+Epoch [188/200] |	Loss: 0.168 	Average Acc: 95.564 
+learning rate: [0.000744533692261307]
+================ Train on the train set ================
+Epoch [189/200] |	Loss: 0.169 	Average Acc: 95.404 
+================ Test on the test set ================
+ * Average Acc: 76.800 Best acc 76.800
+ Per-Task Acc:[76.8]
+learning rate: [0.0006155829702431174]
+================ Train on the train set ================
+Epoch [190/200] |	Loss: 0.155 	Average Acc: 96.080 
+learning rate: [0.0004988171141721235]
+================ Train on the train set ================
+Epoch [191/200] |	Loss: 0.146 	Average Acc: 96.260 
+learning rate: [0.00039426493427611206]
+================ Train on the train set ================
+Epoch [192/200] |	Loss: 0.144 	Average Acc: 96.372 
+learning rate: [0.00030195222724102046]
+================ Train on the train set ================
+Epoch [193/200] |	Loss: 0.141 	Average Acc: 96.472 
+learning rate: [0.00022190176984600036]
+================ Train on the train set ================
+Epoch [194/200] |	Loss: 0.137 	Average Acc: 96.572 
+learning rate: [0.00015413331334360192]
+================ Train on the train set ================
+Epoch [195/200] |	Loss: 0.133 	Average Acc: 96.820 
+learning rate: [9.866357858642213e-05]
+================ Train on the train set ================
+Epoch [196/200] |	Loss: 0.130 	Average Acc: 96.905 
+learning rate: [5.5506251901504864e-05]
+================ Train on the train set ================
+Epoch [197/200] |	Loss: 0.133 	Average Acc: 96.792 
+learning rate: [2.4671981713420017e-05]
+================ Train on the train set ================
+Epoch [198/200] |	Loss: 0.134 	Average Acc: 96.716 
+learning rate: [6.168375916970619e-06]
+================ Train on the train set ================
+Epoch [199/200] |	Loss: 0.131 	Average Acc: 96.816 
+================ Test on the test set ================
+ * Average Acc: 77.040 Best acc 77.040
+ Per-Task Acc:[77.04]
+Construct examplars for class 0
+Construct examplars for class 1
+Construct examplars for class 2
+Construct examplars for class 3
+Construct examplars for class 4
+Construct examplars for class 5
+Construct examplars for class 6
+Construct examplars for class 7
+Construct examplars for class 8
+Construct examplars for class 9
+Construct examplars for class 10
+Construct examplars for class 11
+Construct examplars for class 12
+Construct examplars for class 13
+Construct examplars for class 14
+Construct examplars for class 15
+Construct examplars for class 16
+Construct examplars for class 17
+Construct examplars for class 18
+Construct examplars for class 19
+Construct examplars for class 20
+Construct examplars for class 21
+Construct examplars for class 22
+Construct examplars for class 23
+Construct examplars for class 24
+Construct examplars for class 25
+Construct examplars for class 26
+Construct examplars for class 27
+Construct examplars for class 28
+Construct examplars for class 29
+Construct examplars for class 30
+Construct examplars for class 31
+Construct examplars for class 32
+Construct examplars for class 33
+Construct examplars for class 34
+Construct examplars for class 35
+Construct examplars for class 36
+Construct examplars for class 37
+Construct examplars for class 38
+Construct examplars for class 39
+Construct examplars for class 40
+Construct examplars for class 41
+Construct examplars for class 42
+Construct examplars for class 43
+Construct examplars for class 44
+Construct examplars for class 45
+Construct examplars for class 46
+Construct examplars for class 47
+Construct examplars for class 48
+Construct examplars for class 49
+================Task 1 Start!================
+Trainable params in the model: 470654
+Learning on 50-60
+per cls weights : [1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764 1.05080764
+ 1.05080764 1.05080764 0.74596179 0.74596179 0.74596179 0.74596179
+ 0.74596179 0.74596179 0.74596179 0.74596179 0.74596179 0.74596179]
+SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    maximize: False
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0005
+)
+================Task 1 Training!================
+The training samples number: 6000
+learning rate: [0.1]
+================ Train on the train set ================
+Epoch [0/170] |	Loss: 7.449 	Average Acc: 51.376 
+learning rate: [0.09999146252290264]
+================ Train on the train set ================
+Epoch [1/170] |	Loss: 5.710 	Average Acc: 60.937 
+learning rate: [0.09996585300715116]
+================ Train on the train set ================
+Epoch [2/170] |	Loss: 5.365 	Average Acc: 62.296 
+learning rate: [0.09992318019837171]
+================ Train on the train set ================
+Epoch [3/170] |	Loss: 5.259 	Average Acc: 64.810 
+learning rate: [0.09986345866928942]
+================ Train on the train set ================
+Epoch [4/170] |	Loss: 5.270 	Average Acc: 62.637 
+learning rate: [0.09978670881475173]
+================ Train on the train set ================
+Epoch [5/170] |	Loss: 5.165 	Average Acc: 64.809 
+learning rate: [0.0996929568447637]
+================ Train on the train set ================
+Epoch [6/170] |	Loss: 5.133 	Average Acc: 64.266 
+learning rate: [0.09958223477553715]
+================ Train on the train set ================
+Epoch [7/170] |	Loss: 5.007 	Average Acc: 64.283 
+learning rate: [0.09945458041855731]
+================ Train on the train set ================
+Epoch [8/170] |	Loss: 4.980 	Average Acc: 65.065 
+learning rate: [0.09931003736767013]
+================ Train on the train set ================
+Epoch [9/170] |	Loss: 4.855 	Average Acc: 66.219 
+================ Test on the test set ================
+ * Average Acc: 60.955 Best acc 60.955
+ Per-Task Acc:[69.69, 52.22]
+learning rate: [0.0991486549841951]
+================ Train on the train set ================
+Epoch [10/170] |	Loss: 4.901 	Average Acc: 66.321 
+learning rate: [0.0989704883800683]
+================ Train on the train set ================
+Epoch [11/170] |	Loss: 4.824 	Average Acc: 65.982 
+learning rate: [0.09877559839902185]
+================ Train on the train set ================
+Epoch [12/170] |	Loss: 4.715 	Average Acc: 66.916 
+learning rate: [0.09856405159580571]
+================ Train on the train set ================
+Epoch [13/170] |	Loss: 4.740 	Average Acc: 66.423 
+learning rate: [0.0983359202134594]
+================ Train on the train set ================
+Epoch [14/170] |	Loss: 4.672 	Average Acc: 67.357 
+learning rate: [0.09809128215864098]
+================ Train on the train set ================
+Epoch [15/170] |	Loss: 4.682 	Average Acc: 66.390 
+learning rate: [0.09783022097502206]
+================ Train on the train set ================
+Epoch [16/170] |	Loss: 4.561 	Average Acc: 68.631 
+learning rate: [0.0975528258147577]
+================ Train on the train set ================
+Epoch [17/170] |	Loss: 4.581 	Average Acc: 67.883 
+learning rate: [0.097259191408041]
+================ Train on the train set ================
+Epoch [18/170] |	Loss: 4.584 	Average Acc: 68.173 
+learning rate: [0.09694941803075285]
+================ Train on the train set ================
+Epoch [19/170] |	Loss: 4.475 	Average Acc: 68.020 
+================ Test on the test set ================
+ * Average Acc: 61.730 Best acc 61.730
+ Per-Task Acc:[69.33, 54.13]
+learning rate: [0.09662361147021781]
+================ Train on the train set ================
+Epoch [20/170] |	Loss: 4.427 	Average Acc: 69.565 
+learning rate: [0.09628188298907785]
+================ Train on the train set ================
+Epoch [21/170] |	Loss: 4.397 	Average Acc: 69.821 
+learning rate: [0.09592434928729618]
+================ Train on the train set ================
+Epoch [22/170] |	Loss: 4.441 	Average Acc: 68.682 
+learning rate: [0.09555113246230446]
+================ Train on the train set ================
+Epoch [23/170] |	Loss: 4.353 	Average Acc: 71.264 
+learning rate: [0.09516235996730647]
+================ Train on the train set ================
+Epoch [24/170] |	Loss: 4.327 	Average Acc: 69.820 
+learning rate: [0.09475816456775316]
+================ Train on the train set ================
+Epoch [25/170] |	Loss: 4.303 	Average Acc: 70.160 
+learning rate: [0.09433868429600312]
+================ Train on the train set ================
+Epoch [26/170] |	Loss: 4.266 	Average Acc: 70.738 
+learning rate: [0.09390406240418492]
+================ Train on the train set ================
+Epoch [27/170] |	Loss: 4.251 	Average Acc: 71.842 
+learning rate: [0.09345444731527644]
+================ Train on the train set ================
+Epoch [28/170] |	Loss: 4.223 	Average Acc: 71.009 
+learning rate: [0.09298999257241865]
+================ Train on the train set ================
+Epoch [29/170] |	Loss: 4.152 	Average Acc: 72.113 
+================ Test on the test set ================
+ * Average Acc: 65.035 Best acc 65.035
+ Per-Task Acc:[69.49, 60.58]
+learning rate: [0.09251085678648074]
+================ Train on the train set ================
+Epoch [30/170] |	Loss: 4.182 	Average Acc: 71.434 
+learning rate: [0.09201720358189468]
+================ Train on the train set ================
+Epoch [31/170] |	Loss: 4.227 	Average Acc: 70.703 
+learning rate: [0.09150920154077757]
+================ Train on the train set ================
+Epoch [32/170] |	Loss: 4.110 	Average Acc: 72.911 
+learning rate: [0.09098702414536111]
+================ Train on the train set ================
+Epoch [33/170] |	Loss: 4.090 	Average Acc: 72.962 
+learning rate: [0.09045084971874742]
+================ Train on the train set ================
+Epoch [34/170] |	Loss: 4.097 	Average Acc: 72.690 
+learning rate: [0.08990086136401203]
+================ Train on the train set ================
+Epoch [35/170] |	Loss: 4.064 	Average Acc: 73.709 
+learning rate: [0.0893372469016742]
+================ Train on the train set ================
+Epoch [36/170] |	Loss: 3.984 	Average Acc: 73.659 
+learning rate: [0.08876019880555654]
+================ Train on the train set ================
+Epoch [37/170] |	Loss: 3.999 	Average Acc: 73.726 
+learning rate: [0.0881699141370552]
+================ Train on the train set ================
+Epoch [38/170] |	Loss: 3.999 	Average Acc: 73.590 
+learning rate: [0.08756659447784372]
+================ Train on the train set ================
+Epoch [39/170] |	Loss: 4.067 	Average Acc: 73.386 
+================ Test on the test set ================
+ * Average Acc: 64.965 Best acc 65.035
+ Per-Task Acc:[67.23, 62.7]
+learning rate: [0.08695044586103301]
+================ Train on the train set ================
+Epoch [40/170] |	Loss: 3.938 	Average Acc: 74.167 
+learning rate: [0.08632167870081127]
+================ Train on the train set ================
+Epoch [41/170] |	Loss: 3.881 	Average Acc: 75.153 
+learning rate: [0.08568050772058768]
+================ Train on the train set ================
+Epoch [42/170] |	Loss: 3.935 	Average Acc: 73.981 
+learning rate: [0.0850271518796646]
+================ Train on the train set ================
+Epoch [43/170] |	Loss: 3.833 	Average Acc: 76.511 
+learning rate: [0.0843618342984632]
+================ Train on the train set ================
+Epoch [44/170] |	Loss: 3.819 	Average Acc: 76.325 
+learning rate: [0.08368478218232793]
+================ Train on the train set ================
+Epoch [45/170] |	Loss: 3.775 	Average Acc: 75.424 
+learning rate: [0.08299622674393621]
+================ Train on the train set ================
+Epoch [46/170] |	Loss: 3.718 	Average Acc: 77.157 
+learning rate: [0.08229640312433945]
+================ Train on the train set ================
+Epoch [47/170] |	Loss: 3.785 	Average Acc: 76.103 
+learning rate: [0.08158555031266262]
+================ Train on the train set ================
+Epoch [48/170] |	Loss: 3.763 	Average Acc: 76.342 
+learning rate: [0.08086391106448973]
+================ Train on the train set ================
+Epoch [49/170] |	Loss: 3.700 	Average Acc: 76.597 
+================ Test on the test set ================
+ * Average Acc: 64.520 Best acc 65.035
+ Per-Task Acc:[67.45, 61.59]
+learning rate: [0.08013173181896291]
+================ Train on the train set ================
+Epoch [50/170] |	Loss: 3.725 	Average Acc: 76.495 
+learning rate: [0.07938926261462374]
+================ Train on the train set ================
+Epoch [51/170] |	Loss: 3.617 	Average Acc: 78.838 
+learning rate: [0.07863675700402534]
+================ Train on the train set ================
+Epoch [52/170] |	Loss: 3.638 	Average Acc: 78.702 
+learning rate: [0.07787447196714435]
+================ Train on the train set ================
+Epoch [53/170] |	Loss: 3.626 	Average Acc: 78.380 
+learning rate: [0.07710266782362254]
+================ Train on the train set ================
+Epoch [54/170] |	Loss: 3.623 	Average Acc: 78.635 
+learning rate: [0.07632160814386786]
+================ Train on the train set ================
+Epoch [55/170] |	Loss: 3.622 	Average Acc: 77.836 
+learning rate: [0.07553155965904541]
+================ Train on the train set ================
+Epoch [56/170] |	Loss: 3.518 	Average Acc: 78.820 
+learning rate: [0.07473279216998902]
+================ Train on the train set ================
+Epoch [57/170] |	Loss: 3.561 	Average Acc: 79.093 
+learning rate: [0.0739255784550644]
+================ Train on the train set ================
+Epoch [58/170] |	Loss: 3.486 	Average Acc: 80.536 
+learning rate: [0.07311019417701574]
+================ Train on the train set ================
+Epoch [59/170] |	Loss: 3.494 	Average Acc: 79.348 
+================ Test on the test set ================
+ * Average Acc: 64.990 Best acc 65.035
+ Per-Task Acc:[65.87, 64.11]
+learning rate: [0.072286917788827]
+================ Train on the train set ================
+Epoch [60/170] |	Loss: 3.485 	Average Acc: 79.500 
+learning rate: [0.07145603043863052]
+================ Train on the train set ================
+Epoch [61/170] |	Loss: 3.466 	Average Acc: 79.212 
+learning rate: [0.07061781587369526]
+================ Train on the train set ================
+Epoch [62/170] |	Loss: 3.465 	Average Acc: 80.163 
+learning rate: [0.0697725603435272]
+================ Train on the train set ================
+Epoch [63/170] |	Loss: 3.471 	Average Acc: 79.909 
+learning rate: [0.0689205525021156]
+================ Train on the train set ================
+Epoch [64/170] |	Loss: 3.370 	Average Acc: 80.639 
+learning rate: [0.06806208330935773]
+================ Train on the train set ================
+Epoch [65/170] |	Loss: 3.340 	Average Acc: 81.641 
+learning rate: [0.06719744593169648]
+================ Train on the train set ================
+Epoch [66/170] |	Loss: 3.355 	Average Acc: 81.539 
+learning rate: [0.06632693564200423]
+================ Train on the train set ================
+Epoch [67/170] |	Loss: 3.344 	Average Acc: 81.318 
+learning rate: [0.06545084971874744]
+================ Train on the train set ================
+Epoch [68/170] |	Loss: 3.345 	Average Acc: 81.862 
+learning rate: [0.06456948734446631]
+================ Train on the train set ================
+Epoch [69/170] |	Loss: 3.264 	Average Acc: 82.440 
+================ Test on the test set ================
+ * Average Acc: 64.395 Best acc 65.035
+ Per-Task Acc:[64.48, 64.31]
+learning rate: [0.06368314950360422]
+================ Train on the train set ================
+Epoch [70/170] |	Loss: 3.227 	Average Acc: 83.016 
+learning rate: [0.06279213887972185]
+================ Train on the train set ================
+Epoch [71/170] |	Loss: 3.216 	Average Acc: 83.917 
+learning rate: [0.061896759752131]
+================ Train on the train set ================
+Epoch [72/170] |	Loss: 3.231 	Average Acc: 83.509 
+learning rate: [0.0609973178919835]
+================ Train on the train set ================
+Epoch [73/170] |	Loss: 3.165 	Average Acc: 83.917 
+learning rate: [0.06009412045785057]
+================ Train on the train set ================
+Epoch [74/170] |	Loss: 3.108 	Average Acc: 84.545 
+learning rate: [0.059187475890828574]
+================ Train on the train set ================
+Epoch [75/170] |	Loss: 3.130 	Average Acc: 83.441 
+learning rate: [0.058277693809206554]
+================ Train on the train set ================
+Epoch [76/170] |	Loss: 3.132 	Average Acc: 84.680 
+learning rate: [0.057365084902731935]
+================ Train on the train set ================
+Epoch [77/170] |	Loss: 3.148 	Average Acc: 84.766 
+learning rate: [0.05644996082651022]
+================ Train on the train set ================
+Epoch [78/170] |	Loss: 3.064 	Average Acc: 85.904 
+learning rate: [0.05553263409457509]
+================ Train on the train set ================
+Epoch [79/170] |	Loss: 3.045 	Average Acc: 84.120 
+================ Test on the test set ================
+ * Average Acc: 65.340 Best acc 65.340
+ Per-Task Acc:[66.67, 64.01]
+learning rate: [0.05461341797316515]
+================ Train on the train set ================
+Epoch [80/170] |	Loss: 3.060 	Average Acc: 84.613 
+learning rate: [0.05369262637374375]
+================ Train on the train set ================
+Epoch [81/170] |	Loss: 3.019 	Average Acc: 85.938 
+learning rate: [0.05277057374579855]
+================ Train on the train set ================
+Epoch [82/170] |	Loss: 3.036 	Average Acc: 85.309 
+learning rate: [0.05184757496945729]
+================ Train on the train set ================
+Epoch [83/170] |	Loss: 2.937 	Average Acc: 86.719 
+learning rate: [0.05092394524795654]
+================ Train on the train set ================
+Epoch [84/170] |	Loss: 2.932 	Average Acc: 86.651 
+learning rate: [0.05000000000000005]
+================ Train on the train set ================
+Epoch [85/170] |	Loss: 2.898 	Average Acc: 87.483 
+learning rate: [0.04907605475204356]
+================ Train on the train set ================
+Epoch [86/170] |	Loss: 2.878 	Average Acc: 87.534 
+learning rate: [0.04815242503054281]
+================ Train on the train set ================
+Epoch [87/170] |	Loss: 2.879 	Average Acc: 87.755 
+learning rate: [0.04722942625420156]
+================ Train on the train set ================
+Epoch [88/170] |	Loss: 2.866 	Average Acc: 87.314 
+learning rate: [0.04630737362625635]
+================ Train on the train set ================
+Epoch [89/170] |	Loss: 2.851 	Average Acc: 87.840 
+================ Test on the test set ================
+ * Average Acc: 65.515 Best acc 65.515
+ Per-Task Acc:[64.9, 66.13]
+learning rate: [0.045386582026834946]
+================ Train on the train set ================
+Epoch [90/170] |	Loss: 2.832 	Average Acc: 88.400 
+learning rate: [0.04446736590542501]
+================ Train on the train set ================
+Epoch [91/170] |	Loss: 2.834 	Average Acc: 88.043 
+learning rate: [0.04355003917348989]
+================ Train on the train set ================
+Epoch [92/170] |	Loss: 2.733 	Average Acc: 89.130 
+learning rate: [0.04263491509726818]
+================ Train on the train set ================
+Epoch [93/170] |	Loss: 2.769 	Average Acc: 88.994 
+learning rate: [0.041722306190793534]
+================ Train on the train set ================
+Epoch [94/170] |	Loss: 2.731 	Average Acc: 89.520 
+learning rate: [0.040812524109171515]
+================ Train on the train set ================
+Epoch [95/170] |	Loss: 2.711 	Average Acc: 89.232 
+learning rate: [0.039905879542149525]
+================ Train on the train set ================
+Epoch [96/170] |	Loss: 2.692 	Average Acc: 89.690 
+learning rate: [0.03900268210801661]
+================ Train on the train set ================
+Epoch [97/170] |	Loss: 2.662 	Average Acc: 90.013 
+learning rate: [0.03810324024786912]
+================ Train on the train set ================
+Epoch [98/170] |	Loss: 2.698 	Average Acc: 89.537 
+learning rate: [0.03720786112027826]
+================ Train on the train set ================
+Epoch [99/170] |	Loss: 2.679 	Average Acc: 89.928 
+================ Test on the test set ================
+ * Average Acc: 66.815 Best acc 66.815
+ Per-Task Acc:[64.58, 69.05]
+learning rate: [0.0363168504963959]
+================ Train on the train set ================
+Epoch [100/170] |	Loss: 2.626 	Average Acc: 90.676 
+learning rate: [0.03543051265553381]
+================ Train on the train set ================
+Epoch [101/170] |	Loss: 2.600 	Average Acc: 90.845 
+learning rate: [0.034549150281252675]
+================ Train on the train set ================
+Epoch [102/170] |	Loss: 2.613 	Average Acc: 90.981 
+learning rate: [0.033673064357995885]
+================ Train on the train set ================
+Epoch [103/170] |	Loss: 2.543 	Average Acc: 91.915 
+learning rate: [0.03280255406830363]
+================ Train on the train set ================
+Epoch [104/170] |	Loss: 2.508 	Average Acc: 91.575 
+learning rate: [0.031937916690642394]
+================ Train on the train set ================
+Epoch [105/170] |	Loss: 2.559 	Average Acc: 91.474 
+learning rate: [0.03107944749788453]
+================ Train on the train set ================
+Epoch [106/170] |	Loss: 2.512 	Average Acc: 92.476 
+learning rate: [0.030227439656472916]
+================ Train on the train set ================
+Epoch [107/170] |	Loss: 2.533 	Average Acc: 91.270 
+learning rate: [0.02938218412630487]
+================ Train on the train set ================
+Epoch [108/170] |	Loss: 2.489 	Average Acc: 92.391 
+learning rate: [0.028543969561369613]
+================ Train on the train set ================
+Epoch [109/170] |	Loss: 2.472 	Average Acc: 92.832 
+================ Test on the test set ================
+ * Average Acc: 67.545 Best acc 67.545
+ Per-Task Acc:[67.95, 67.14]
+learning rate: [0.027713082211173128]
+================ Train on the train set ================
+Epoch [110/170] |	Loss: 2.451 	Average Acc: 93.258 
+learning rate: [0.02688980582298438]
+================ Train on the train set ================
+Epoch [111/170] |	Loss: 2.438 	Average Acc: 92.459 
+learning rate: [0.02607442154493571]
+================ Train on the train set ================
+Epoch [112/170] |	Loss: 2.427 	Average Acc: 93.631 
+learning rate: [0.0252672078300111]
+================ Train on the train set ================
+Epoch [113/170] |	Loss: 2.420 	Average Acc: 93.512 
+learning rate: [0.024468440340954693]
+================ Train on the train set ================
+Epoch [114/170] |	Loss: 2.408 	Average Acc: 93.563 
+learning rate: [0.02367839185613223]
+================ Train on the train set ================
+Epoch [115/170] |	Loss: 2.403 	Average Acc: 93.376 
+learning rate: [0.022897332176377554]
+================ Train on the train set ================
+Epoch [116/170] |	Loss: 2.370 	Average Acc: 94.277 
+learning rate: [0.02212552803285575]
+================ Train on the train set ================
+Epoch [117/170] |	Loss: 2.340 	Average Acc: 94.463 
+learning rate: [0.02136324299597477]
+================ Train on the train set ================
+Epoch [118/170] |	Loss: 2.343 	Average Acc: 94.192 
+learning rate: [0.020610737385376377]
+================ Train on the train set ================
+Epoch [119/170] |	Loss: 2.350 	Average Acc: 94.362 
+================ Test on the test set ================
+ * Average Acc: 68.910 Best acc 68.910
+ Per-Task Acc:[65.44, 72.38]
+learning rate: [0.01986826818103721]
+================ Train on the train set ================
+Epoch [120/170] |	Loss: 2.317 	Average Acc: 94.650 
+learning rate: [0.019136088935510383]
+================ Train on the train set ================
+Epoch [121/170] |	Loss: 2.317 	Average Acc: 94.684 
+learning rate: [0.01841444968733749]
+================ Train on the train set ================
+Epoch [122/170] |	Loss: 2.289 	Average Acc: 94.904 
+learning rate: [0.017703596875660668]
+================ Train on the train set ================
+Epoch [123/170] |	Loss: 2.301 	Average Acc: 95.143 
+learning rate: [0.017003773256063906]
+================ Train on the train set ================
+Epoch [124/170] |	Loss: 2.281 	Average Acc: 95.193 
+learning rate: [0.01631521781767218]
+================ Train on the train set ================
+Epoch [125/170] |	Loss: 2.266 	Average Acc: 95.448 
+learning rate: [0.01563816570153689]
+================ Train on the train set ================
+Epoch [126/170] |	Loss: 2.264 	Average Acc: 95.517 
+learning rate: [0.014972848120335475]
+================ Train on the train set ================
+Epoch [127/170] |	Loss: 2.246 	Average Acc: 95.789 
+learning rate: [0.014319492279412408]
+================ Train on the train set ================
+Epoch [128/170] |	Loss: 2.243 	Average Acc: 95.992 
+learning rate: [0.01367832129918882]
+================ Train on the train set ================
+Epoch [129/170] |	Loss: 2.251 	Average Acc: 96.231 
+================ Test on the test set ================
+ * Average Acc: 67.955 Best acc 68.910
+ Per-Task Acc:[65.95, 69.96]
+learning rate: [0.01304955413896707]
+================ Train on the train set ================
+Epoch [130/170] |	Loss: 2.243 	Average Acc: 95.856 
+learning rate: [0.012433405522156351]
+================ Train on the train set ================
+Epoch [131/170] |	Loss: 2.246 	Average Acc: 95.601 
+learning rate: [0.011830085862944869]
+================ Train on the train set ================
+Epoch [132/170] |	Loss: 2.220 	Average Acc: 96.349 
+learning rate: [0.011239801194443523]
+================ Train on the train set ================
+Epoch [133/170] |	Loss: 2.230 	Average Acc: 96.061 
+learning rate: [0.010662753098325855]
+================ Train on the train set ================
+Epoch [134/170] |	Loss: 2.209 	Average Acc: 96.146 
+learning rate: [0.01009913863598804]
+================ Train on the train set ================
+Epoch [135/170] |	Loss: 2.203 	Average Acc: 96.910 
+learning rate: [0.009549150281252647]
+================ Train on the train set ================
+Epoch [136/170] |	Loss: 2.203 	Average Acc: 96.485 
+learning rate: [0.009012975854638963]
+================ Train on the train set ================
+Epoch [137/170] |	Loss: 2.203 	Average Acc: 96.418 
+learning rate: [0.008490798459222489]
+================ Train on the train set ================
+Epoch [138/170] |	Loss: 2.186 	Average Acc: 96.060 
+learning rate: [0.007982796418105382]
+================ Train on the train set ================
+Epoch [139/170] |	Loss: 2.184 	Average Acc: 96.486 
+================ Test on the test set ================
+ * Average Acc: 69.095 Best acc 69.095
+ Per-Task Acc:[65.91, 72.28]
+learning rate: [0.007489143213519312]
+================ Train on the train set ================
+Epoch [140/170] |	Loss: 2.177 	Average Acc: 96.349 
+learning rate: [0.0070100074275813995]
+================ Train on the train set ================
+Epoch [141/170] |	Loss: 2.179 	Average Acc: 96.400 
+learning rate: [0.0065455526847235925]
+================ Train on the train set ================
+Epoch [142/170] |	Loss: 2.178 	Average Acc: 96.961 
+learning rate: [0.0060959375958151134]
+================ Train on the train set ================
+Epoch [143/170] |	Loss: 2.180 	Average Acc: 96.877 
+learning rate: [0.005661315703996914]
+================ Train on the train set ================
+Epoch [144/170] |	Loss: 2.179 	Average Acc: 96.400 
+learning rate: [0.0052418354322468965]
+================ Train on the train set ================
+Epoch [145/170] |	Loss: 2.183 	Average Acc: 96.961 
+learning rate: [0.0048376400326935656]
+================ Train on the train set ================
+Epoch [146/170] |	Loss: 2.167 	Average Acc: 97.029 
+learning rate: [0.0044488675376955856]
+================ Train on the train set ================
+Epoch [147/170] |	Loss: 2.159 	Average Acc: 96.859 
+learning rate: [0.004075650712703856]
+================ Train on the train set ================
+Epoch [148/170] |	Loss: 2.167 	Average Acc: 96.791 
+learning rate: [0.0037181170109221906]
+================ Train on the train set ================
+Epoch [149/170] |	Loss: 2.163 	Average Acc: 96.757 
+================ Test on the test set ================
+ * Average Acc: 68.815 Best acc 69.095
+ Per-Task Acc:[67.17, 70.46]
+learning rate: [0.003376388529782215]
+================ Train on the train set ================
+Epoch [150/170] |	Loss: 2.156 	Average Acc: 96.723 
+learning rate: [0.0030505819692471787]
+================ Train on the train set ================
+Epoch [151/170] |	Loss: 2.169 	Average Acc: 97.029 
+learning rate: [0.0027408085919590312]
+================ Train on the train set ================
+Epoch [152/170] |	Loss: 2.160 	Average Acc: 97.097 
+learning rate: [0.002447174185242328]
+================ Train on the train set ================
+Epoch [153/170] |	Loss: 2.153 	Average Acc: 96.808 
+learning rate: [0.0021697790249779673]
+================ Train on the train set ================
+Epoch [154/170] |	Loss: 2.160 	Average Acc: 97.267 
+learning rate: [0.0019087178413590509]
+================ Train on the train set ================
+Epoch [155/170] |	Loss: 2.158 	Average Acc: 96.910 
+learning rate: [0.0016640797865406314]
+================ Train on the train set ================
+Epoch [156/170] |	Loss: 2.150 	Average Acc: 97.165 
+learning rate: [0.0014359484041943117]
+================ Train on the train set ================
+Epoch [157/170] |	Loss: 2.152 	Average Acc: 96.808 
+learning rate: [0.0012244016009781721]
+================ Train on the train set ================
+Epoch [158/170] |	Loss: 2.153 	Average Acc: 96.962 
+learning rate: [0.0010295116199317074]
+================ Train on the train set ================
+Epoch [159/170] |	Loss: 2.158 	Average Acc: 96.655 
+================ Test on the test set ================
+ * Average Acc: 68.900 Best acc 69.095
+ Per-Task Acc:[66.53, 71.27]
+learning rate: [0.0008513450158049123]
+================ Train on the train set ================
+Epoch [160/170] |	Loss: 2.151 	Average Acc: 97.404 
+learning rate: [0.0006899626323298725]
+================ Train on the train set ================
+Epoch [161/170] |	Loss: 2.153 	Average Acc: 97.182 
+learning rate: [0.000545419581442703]
+================ Train on the train set ================
+Epoch [162/170] |	Loss: 2.153 	Average Acc: 97.097 
+learning rate: [0.0004177652244628634]
+================ Train on the train set ================
+Epoch [163/170] |	Loss: 2.158 	Average Acc: 97.080 
+learning rate: [0.00030704315523632006]
+================ Train on the train set ================
+Epoch [164/170] |	Loss: 2.155 	Average Acc: 97.386 
+learning rate: [0.00021329118524827698]
+================ Train on the train set ================
+Epoch [165/170] |	Loss: 2.156 	Average Acc: 96.944 
+learning rate: [0.00013654133071059918]
+================ Train on the train set ================
+Epoch [166/170] |	Loss: 2.150 	Average Acc: 97.250 
+learning rate: [7.681980162830296e-05]
+================ Train on the train set ================
+Epoch [167/170] |	Loss: 2.151 	Average Acc: 97.079 
+learning rate: [3.414699284885476e-05]
+================ Train on the train set ================
+Epoch [168/170] |	Loss: 2.149 	Average Acc: 96.927 
+learning rate: [8.537477097364536e-06]
+================ Train on the train set ================
+Epoch [169/170] |	Loss: 2.159 	Average Acc: 97.064 
+================ Test on the test set ================
+ * Average Acc: 69.160 Best acc 69.160
+ Per-Task Acc:[66.85, 71.47]
+do not weight align teacher!
+per cls weights : [1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529 1.09966529
+ 1.09966529 1.09966529 0.50167353 0.50167353 0.50167353 0.50167353
+ 0.50167353 0.50167353 0.50167353 0.50167353 0.50167353 0.50167353]
+SNet: Task 1, Epoch 1/130 => Loss 2.598,  Train_accy 51.02, Test_accy 26.97
+SNet: Task 1, Epoch 2/130 => Loss 2.220,  Train_accy 65.73
+SNet: Task 1, Epoch 3/130 => Loss 2.075,  Train_accy 71.72
+SNet: Task 1, Epoch 4/130 => Loss 2.022,  Train_accy 74.05
+SNet: Task 1, Epoch 5/130 => Loss 1.963,  Train_accy 76.80
+SNet: Task 1, Epoch 6/130 => Loss 1.924,  Train_accy 78.06, Test_accy 49.70
+SNet: Task 1, Epoch 7/130 => Loss 1.887,  Train_accy 80.50
+SNet: Task 1, Epoch 8/130 => Loss 1.859,  Train_accy 81.87
+SNet: Task 1, Epoch 9/130 => Loss 1.848,  Train_accy 81.82
+SNet: Task 1, Epoch 10/130 => Loss 1.824,  Train_accy 83.42
+SNet: Task 1, Epoch 11/130 => Loss 1.809,  Train_accy 83.87, Test_accy 56.45
+SNet: Task 1, Epoch 12/130 => Loss 1.795,  Train_accy 84.76
+SNet: Task 1, Epoch 13/130 => Loss 1.764,  Train_accy 85.33
+SNet: Task 1, Epoch 14/130 => Loss 1.762,  Train_accy 86.93
+SNet: Task 1, Epoch 15/130 => Loss 1.762,  Train_accy 85.91
+SNet: Task 1, Epoch 16/130 => Loss 1.762,  Train_accy 86.70, Test_accy 55.88
+SNet: Task 1, Epoch 17/130 => Loss 1.744,  Train_accy 86.97
+SNet: Task 1, Epoch 18/130 => Loss 1.719,  Train_accy 87.42
+SNet: Task 1, Epoch 19/130 => Loss 1.735,  Train_accy 87.83
+SNet: Task 1, Epoch 20/130 => Loss 1.707,  Train_accy 87.80
+SNet: Task 1, Epoch 21/130 => Loss 1.703,  Train_accy 88.44, Test_accy 58.89
+SNet: Task 1, Epoch 22/130 => Loss 1.702,  Train_accy 88.65
+SNet: Task 1, Epoch 23/130 => Loss 1.701,  Train_accy 88.85
+SNet: Task 1, Epoch 24/130 => Loss 1.697,  Train_accy 89.37
+SNet: Task 1, Epoch 25/130 => Loss 1.689,  Train_accy 89.56
+SNet: Task 1, Epoch 26/130 => Loss 1.677,  Train_accy 89.41, Test_accy 60.98
+SNet: Task 1, Epoch 27/130 => Loss 1.672,  Train_accy 90.06
+SNet: Task 1, Epoch 28/130 => Loss 1.669,  Train_accy 90.21
+SNet: Task 1, Epoch 29/130 => Loss 1.672,  Train_accy 90.14
+SNet: Task 1, Epoch 30/130 => Loss 1.671,  Train_accy 91.03
+SNet: Task 1, Epoch 31/130 => Loss 1.660,  Train_accy 90.89, Test_accy 60.29
+SNet: Task 1, Epoch 32/130 => Loss 1.652,  Train_accy 90.94
+SNet: Task 1, Epoch 33/130 => Loss 1.658,  Train_accy 90.54
+SNet: Task 1, Epoch 34/130 => Loss 1.651,  Train_accy 90.74
+SNet: Task 1, Epoch 35/130 => Loss 1.650,  Train_accy 90.78
+SNet: Task 1, Epoch 36/130 => Loss 1.654,  Train_accy 90.66, Test_accy 61.35
+SNet: Task 1, Epoch 37/130 => Loss 1.646,  Train_accy 91.53
+SNet: Task 1, Epoch 38/130 => Loss 1.637,  Train_accy 90.88
+SNet: Task 1, Epoch 39/130 => Loss 1.629,  Train_accy 91.43
+SNet: Task 1, Epoch 40/130 => Loss 1.643,  Train_accy 91.13
+SNet: Task 1, Epoch 41/130 => Loss 1.630,  Train_accy 91.48, Test_accy 61.98
+SNet: Task 1, Epoch 42/130 => Loss 1.636,  Train_accy 91.84
+SNet: Task 1, Epoch 43/130 => Loss 1.639,  Train_accy 91.83
+SNet: Task 1, Epoch 44/130 => Loss 1.616,  Train_accy 91.39
+SNet: Task 1, Epoch 45/130 => Loss 1.623,  Train_accy 91.66
+SNet: Task 1, Epoch 46/130 => Loss 1.629,  Train_accy 91.88, Test_accy 61.97
+SNet: Task 1, Epoch 47/130 => Loss 1.623,  Train_accy 91.74
+SNet: Task 1, Epoch 48/130 => Loss 1.632,  Train_accy 91.84
+SNet: Task 1, Epoch 49/130 => Loss 1.611,  Train_accy 92.03
+SNet: Task 1, Epoch 50/130 => Loss 1.605,  Train_accy 92.08
+SNet: Task 1, Epoch 51/130 => Loss 1.613,  Train_accy 91.90, Test_accy 63.10
+SNet: Task 1, Epoch 52/130 => Loss 1.604,  Train_accy 91.81
+SNet: Task 1, Epoch 53/130 => Loss 1.619,  Train_accy 92.60
+SNet: Task 1, Epoch 54/130 => Loss 1.606,  Train_accy 92.38
+SNet: Task 1, Epoch 55/130 => Loss 1.604,  Train_accy 92.33
+SNet: Task 1, Epoch 56/130 => Loss 1.617,  Train_accy 92.50, Test_accy 62.08
+SNet: Task 1, Epoch 57/130 => Loss 1.605,  Train_accy 92.36
+SNet: Task 1, Epoch 58/130 => Loss 1.610,  Train_accy 92.70
+SNet: Task 1, Epoch 59/130 => Loss 1.605,  Train_accy 92.30
+SNet: Task 1, Epoch 60/130 => Loss 1.593,  Train_accy 92.48
+SNet: Task 1, Epoch 61/130 => Loss 1.596,  Train_accy 92.60, Test_accy 64.99
+SNet: Task 1, Epoch 62/130 => Loss 1.605,  Train_accy 92.18
+SNet: Task 1, Epoch 63/130 => Loss 1.603,  Train_accy 92.63
+SNet: Task 1, Epoch 64/130 => Loss 1.593,  Train_accy 92.61
+SNet: Task 1, Epoch 65/130 => Loss 1.597,  Train_accy 92.75
+SNet: Task 1, Epoch 66/130 => Loss 1.598,  Train_accy 92.50, Test_accy 63.94
+SNet: Task 1, Epoch 67/130 => Loss 1.587,  Train_accy 92.68
+SNet: Task 1, Epoch 68/130 => Loss 1.591,  Train_accy 92.93
+SNet: Task 1, Epoch 69/130 => Loss 1.587,  Train_accy 92.71
+SNet: Task 1, Epoch 70/130 => Loss 1.599,  Train_accy 92.78
+SNet: Task 1, Epoch 71/130 => Loss 1.579,  Train_accy 93.01, Test_accy 64.72
+SNet: Task 1, Epoch 72/130 => Loss 1.582,  Train_accy 93.03
+SNet: Task 1, Epoch 73/130 => Loss 1.584,  Train_accy 92.75
+SNet: Task 1, Epoch 74/130 => Loss 1.584,  Train_accy 92.93
+SNet: Task 1, Epoch 75/130 => Loss 1.586,  Train_accy 93.15
+SNet: Task 1, Epoch 76/130 => Loss 1.576,  Train_accy 93.08, Test_accy 65.24
+SNet: Task 1, Epoch 77/130 => Loss 1.584,  Train_accy 93.20
+SNet: Task 1, Epoch 78/130 => Loss 1.582,  Train_accy 93.42
+SNet: Task 1, Epoch 79/130 => Loss 1.583,  Train_accy 93.25
+SNet: Task 1, Epoch 80/130 => Loss 1.577,  Train_accy 93.22
+SNet: Task 1, Epoch 81/130 => Loss 1.575,  Train_accy 92.51, Test_accy 65.34
+SNet: Task 1, Epoch 82/130 => Loss 1.578,  Train_accy 93.01
+SNet: Task 1, Epoch 83/130 => Loss 1.564,  Train_accy 93.27
+SNet: Task 1, Epoch 84/130 => Loss 1.571,  Train_accy 92.45
+SNet: Task 1, Epoch 85/130 => Loss 1.573,  Train_accy 92.70
+SNet: Task 1, Epoch 86/130 => Loss 1.572,  Train_accy 93.42, Test_accy 65.17
+SNet: Task 1, Epoch 87/130 => Loss 1.574,  Train_accy 92.95
+SNet: Task 1, Epoch 88/130 => Loss 1.575,  Train_accy 93.23
+SNet: Task 1, Epoch 89/130 => Loss 1.578,  Train_accy 92.90
+SNet: Task 1, Epoch 90/130 => Loss 1.571,  Train_accy 92.96
+SNet: Task 1, Epoch 91/130 => Loss 1.575,  Train_accy 92.96, Test_accy 65.61
+SNet: Task 1, Epoch 92/130 => Loss 1.573,  Train_accy 93.05
+SNet: Task 1, Epoch 93/130 => Loss 1.558,  Train_accy 92.88
+SNet: Task 1, Epoch 94/130 => Loss 1.578,  Train_accy 93.28
+SNet: Task 1, Epoch 95/130 => Loss 1.567,  Train_accy 93.10
+SNet: Task 1, Epoch 96/130 => Loss 1.569,  Train_accy 92.76, Test_accy 65.79
+SNet: Task 1, Epoch 97/130 => Loss 1.568,  Train_accy 93.11
+SNet: Task 1, Epoch 98/130 => Loss 1.557,  Train_accy 93.42
+SNet: Task 1, Epoch 99/130 => Loss 1.565,  Train_accy 92.80
+SNet: Task 1, Epoch 100/130 => Loss 1.561,  Train_accy 93.11
+SNet: Task 1, Epoch 101/130 => Loss 1.563,  Train_accy 93.11, Test_accy 65.66
+SNet: Task 1, Epoch 102/130 => Loss 1.554,  Train_accy 93.27
+SNet: Task 1, Epoch 103/130 => Loss 1.562,  Train_accy 93.85
+SNet: Task 1, Epoch 104/130 => Loss 1.560,  Train_accy 92.73
+SNet: Task 1, Epoch 105/130 => Loss 1.564,  Train_accy 92.78
+SNet: Task 1, Epoch 106/130 => Loss 1.564,  Train_accy 92.75, Test_accy 65.98
+SNet: Task 1, Epoch 107/130 => Loss 1.557,  Train_accy 93.60
+SNet: Task 1, Epoch 108/130 => Loss 1.561,  Train_accy 93.23
+SNet: Task 1, Epoch 109/130 => Loss 1.564,  Train_accy 92.75
+SNet: Task 1, Epoch 110/130 => Loss 1.569,  Train_accy 93.62
+SNet: Task 1, Epoch 111/130 => Loss 1.557,  Train_accy 93.18, Test_accy 66.03
+SNet: Task 1, Epoch 112/130 => Loss 1.558,  Train_accy 93.38
+SNet: Task 1, Epoch 113/130 => Loss 1.564,  Train_accy 93.10
+SNet: Task 1, Epoch 114/130 => Loss 1.558,  Train_accy 93.43
+SNet: Task 1, Epoch 115/130 => Loss 1.551,  Train_accy 93.58
+SNet: Task 1, Epoch 116/130 => Loss 1.550,  Train_accy 93.13, Test_accy 65.88
+SNet: Task 1, Epoch 117/130 => Loss 1.563,  Train_accy 93.33
+SNet: Task 1, Epoch 118/130 => Loss 1.551,  Train_accy 93.47
+SNet: Task 1, Epoch 119/130 => Loss 1.558,  Train_accy 93.70
+SNet: Task 1, Epoch 120/130 => Loss 1.558,  Train_accy 93.06
+SNet: Task 1, Epoch 121/130 => Loss 1.564,  Train_accy 93.20, Test_accy 65.76
+SNet: Task 1, Epoch 122/130 => Loss 1.559,  Train_accy 93.95
+SNet: Task 1, Epoch 123/130 => Loss 1.556,  Train_accy 93.27
+SNet: Task 1, Epoch 124/130 => Loss 1.569,  Train_accy 93.27
+SNet: Task 1, Epoch 125/130 => Loss 1.567,  Train_accy 93.38
+SNet: Task 1, Epoch 126/130 => Loss 1.569,  Train_accy 93.03, Test_accy 65.96
+SNet: Task 1, Epoch 127/130 => Loss 1.569,  Train_accy 93.40
+SNet: Task 1, Epoch 128/130 => Loss 1.558,  Train_accy 93.58
+SNet: Task 1, Epoch 129/130 => Loss 1.555,  Train_accy 93.33
+SNet: Task 1, Epoch 130/130 => Loss 1.564,  Train_accy 93.25
+do not weight align student!
+darknet eval: 
+CNN top1 curve: 66.17647058823529
+Construct examplars for class 0
+Construct examplars for class 1
+Construct examplars for class 2
+Construct examplars for class 3
+Construct examplars for class 4
+Construct examplars for class 5
+Construct examplars for class 6
+Construct examplars for class 7
+Construct examplars for class 8
+Construct examplars for class 9
+Construct examplars for class 10
+Construct examplars for class 11
+Construct examplars for class 12
+Construct examplars for class 13
+Construct examplars for class 14
+Construct examplars for class 15
+Construct examplars for class 16
+Construct examplars for class 17
+Construct examplars for class 18
+Construct examplars for class 19
+Construct examplars for class 20
+Construct examplars for class 21
+Construct examplars for class 22
+Construct examplars for class 23
+Construct examplars for class 24
+Construct examplars for class 25
+Construct examplars for class 26
+Construct examplars for class 27
+Construct examplars for class 28
+Construct examplars for class 29
+Construct examplars for class 30
+Construct examplars for class 31
+Construct examplars for class 32
+Construct examplars for class 33
+Construct examplars for class 34
+Construct examplars for class 35
+Construct examplars for class 36
+Construct examplars for class 37
+Construct examplars for class 38
+Construct examplars for class 39
+Construct examplars for class 40
+Construct examplars for class 41
+Construct examplars for class 42
+Construct examplars for class 43
+Construct examplars for class 44
+Construct examplars for class 45
+Construct examplars for class 46
+Construct examplars for class 47
+Construct examplars for class 48
+Construct examplars for class 49
+Construct examplars for class 50
+Construct examplars for class 51
+Construct examplars for class 52
+Construct examplars for class 53
+Construct examplars for class 54
+Construct examplars for class 55
+Construct examplars for class 56
+Construct examplars for class 57
+Construct examplars for class 58
+Construct examplars for class 59
+================Task 2 Start!================
+Trainable params in the model: 475794
+Learning on 60-70
+per cls weights : [1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559 1.04323559
+ 0.74058644 0.74058644 0.74058644 0.74058644 0.74058644 0.74058644
+ 0.74058644 0.74058644 0.74058644 0.74058644]
+SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    maximize: False
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0005
+)
+================Task 2 Training!================
+The training samples number: 6200
+learning rate: [0.1]
+================ Train on the train set ================
+Epoch [0/170] |	Loss: 5.939 	Average Acc: 62.012 
+learning rate: [0.09999146252290264]
+================ Train on the train set ================
+Epoch [1/170] |	Loss: 3.963 	Average Acc: 77.457 
+learning rate: [0.09996585300715116]
+================ Train on the train set ================
+Epoch [2/170] |	Loss: 3.470 	Average Acc: 80.322 
+learning rate: [0.09992318019837171]
+================ Train on the train set ================
+Epoch [3/170] |	Loss: 3.274 	Average Acc: 81.413 
+learning rate: [0.09986345866928942]
+================ Train on the train set ================
+Epoch [4/170] |	Loss: 3.180 	Average Acc: 81.966 
+learning rate: [0.09978670881475173]
+================ Train on the train set ================
+Epoch [5/170] |	Loss: 2.983 	Average Acc: 84.196 
+learning rate: [0.0996929568447637]
+================ Train on the train set ================
+Epoch [6/170] |	Loss: 2.911 	Average Acc: 85.433 
+learning rate: [0.09958223477553715]
+================ Train on the train set ================
+Epoch [7/170] |	Loss: 2.831 	Average Acc: 87.728 
+learning rate: [0.09945458041855731]
+================ Train on the train set ================
+Epoch [8/170] |	Loss: 2.788 	Average Acc: 88.037 
+learning rate: [0.09931003736767013]
+================ Train on the train set ================
+Epoch [9/170] |	Loss: 2.753 	Average Acc: 88.118 
+================ Test on the test set ================
+ * Average Acc: 63.087 Best acc 63.087
+ Per-Task Acc:[51.76, 69.66, 67.84]
+learning rate: [0.0991486549841951]
+================ Train on the train set ================
+Epoch [10/170] |	Loss: 2.820 	Average Acc: 86.947 
+learning rate: [0.0989704883800683]
+================ Train on the train set ================
+Epoch [11/170] |	Loss: 2.785 	Average Acc: 87.515 
+learning rate: [0.09877559839902185]
+================ Train on the train set ================
+Epoch [12/170] |	Loss: 2.637 	Average Acc: 90.201 
+learning rate: [0.09856405159580571]
+================ Train on the train set ================
+Epoch [13/170] |	Loss: 2.618 	Average Acc: 90.185 
+learning rate: [0.0983359202134594]
+================ Train on the train set ================
+Epoch [14/170] |	Loss: 2.656 	Average Acc: 90.738 
+learning rate: [0.09809128215864098]
+================ Train on the train set ================
+Epoch [15/170] |	Loss: 2.677 	Average Acc: 89.941 
+learning rate: [0.09783022097502206]
+================ Train on the train set ================
+Epoch [16/170] |	Loss: 2.682 	Average Acc: 90.185 
+learning rate: [0.0975528258147577]
+================ Train on the train set ================
+Epoch [17/170] |	Loss: 2.627 	Average Acc: 90.511 
+learning rate: [0.097259191408041]
+================ Train on the train set ================
+Epoch [18/170] |	Loss: 2.649 	Average Acc: 90.593 
+learning rate: [0.09694941803075285]
+================ Train on the train set ================
+Epoch [19/170] |	Loss: 2.601 	Average Acc: 91.553 
+================ Test on the test set ================
+ * Average Acc: 66.157 Best acc 66.157
+ Per-Task Acc:[52.7, 70.97, 74.8]
+learning rate: [0.09662361147021781]
+================ Train on the train set ================
+Epoch [20/170] |	Loss: 2.635 	Average Acc: 91.292 
+learning rate: [0.09628188298907785]
+================ Train on the train set ================
+Epoch [21/170] |	Loss: 2.634 	Average Acc: 90.576 
+learning rate: [0.09592434928729618]
+================ Train on the train set ================
+Epoch [22/170] |	Loss: 2.600 	Average Acc: 91.764 
+learning rate: [0.09555113246230446]
+================ Train on the train set ================
+Epoch [23/170] |	Loss: 2.601 	Average Acc: 91.065 
+learning rate: [0.09516235996730647]
+================ Train on the train set ================
+Epoch [24/170] |	Loss: 2.636 	Average Acc: 91.259 
+learning rate: [0.09475816456775316]
+================ Train on the train set ================
+Epoch [25/170] |	Loss: 2.635 	Average Acc: 91.553 
+learning rate: [0.09433868429600312]
+================ Train on the train set ================
+Epoch [26/170] |	Loss: 2.584 	Average Acc: 92.301 
+learning rate: [0.09390406240418492]
+================ Train on the train set ================
+Epoch [27/170] |	Loss: 2.584 	Average Acc: 92.025 
+learning rate: [0.09345444731527644]
+================ Train on the train set ================
+Epoch [28/170] |	Loss: 2.599 	Average Acc: 91.373 
+learning rate: [0.09298999257241865]
+================ Train on the train set ================
+Epoch [29/170] |	Loss: 2.605 	Average Acc: 91.845 
+================ Test on the test set ================
+ * Average Acc: 64.510 Best acc 66.157
+ Per-Task Acc:[52.2, 68.85, 72.48]
+learning rate: [0.09251085678648074]
+================ Train on the train set ================
+Epoch [30/170] |	Loss: 2.568 	Average Acc: 92.301 
+learning rate: [0.09201720358189468]
+================ Train on the train set ================
+Epoch [31/170] |	Loss: 2.573 	Average Acc: 92.464 
+learning rate: [0.09150920154077757]
+================ Train on the train set ================
+Epoch [32/170] |	Loss: 2.636 	Average Acc: 91.422 
+learning rate: [0.09098702414536111]
+================ Train on the train set ================
+Epoch [33/170] |	Loss: 2.623 	Average Acc: 91.991 
+learning rate: [0.09045084971874742]
+================ Train on the train set ================
+Epoch [34/170] |	Loss: 2.576 	Average Acc: 92.822 
+learning rate: [0.08990086136401203]
+================ Train on the train set ================
+Epoch [35/170] |	Loss: 2.525 	Average Acc: 93.522 
+learning rate: [0.0893372469016742]
+================ Train on the train set ================
+Epoch [36/170] |	Loss: 2.498 	Average Acc: 93.929 
+learning rate: [0.08876019880555654]
+================ Train on the train set ================
+Epoch [37/170] |	Loss: 2.471 	Average Acc: 94.368 
+learning rate: [0.0881699141370552]
+================ Train on the train set ================
+Epoch [38/170] |	Loss: 2.446 	Average Acc: 94.873 
+learning rate: [0.08756659447784372]
+================ Train on the train set ================
+Epoch [39/170] |	Loss: 2.469 	Average Acc: 94.465 
+================ Test on the test set ================
+ * Average Acc: 65.600 Best acc 66.157
+ Per-Task Acc:[51.84, 68.04, 76.92]
+learning rate: [0.08695044586103301]
+================ Train on the train set ================
+Epoch [40/170] |	Loss: 2.581 	Average Acc: 92.497 
+learning rate: [0.08632167870081127]
+================ Train on the train set ================
+Epoch [41/170] |	Loss: 2.504 	Average Acc: 93.474 
+learning rate: [0.08568050772058768]
+================ Train on the train set ================
+Epoch [42/170] |	Loss: 2.575 	Average Acc: 92.154 
+learning rate: [0.0850271518796646]
+================ Train on the train set ================
+Epoch [43/170] |	Loss: 2.546 	Average Acc: 93.376 
+learning rate: [0.0843618342984632]
+================ Train on the train set ================
+Epoch [44/170] |	Loss: 2.483 	Average Acc: 94.238 
+learning rate: [0.08368478218232793]
+================ Train on the train set ================
+Epoch [45/170] |	Loss: 2.448 	Average Acc: 95.085 
+learning rate: [0.08299622674393621]
+================ Train on the train set ================
+Epoch [46/170] |	Loss: 2.481 	Average Acc: 94.222 
+learning rate: [0.08229640312433945]
+================ Train on the train set ================
+Epoch [47/170] |	Loss: 2.466 	Average Acc: 94.206 
+learning rate: [0.08158555031266262]
+================ Train on the train set ================
+Epoch [48/170] |	Loss: 2.501 	Average Acc: 94.385 
+learning rate: [0.08086391106448973]
+================ Train on the train set ================
+Epoch [49/170] |	Loss: 2.535 	Average Acc: 93.147 
+================ Test on the test set ================
+ * Average Acc: 64.197 Best acc 66.157
+ Per-Task Acc:[48.94, 66.33, 77.32]
+learning rate: [0.08013173181896291]
+================ Train on the train set ================
+Epoch [50/170] |	Loss: 2.497 	Average Acc: 93.799 
+learning rate: [0.07938926261462374]
+================ Train on the train set ================
+Epoch [51/170] |	Loss: 2.493 	Average Acc: 94.531 
+learning rate: [0.07863675700402534]
+================ Train on the train set ================
+Epoch [52/170] |	Loss: 2.472 	Average Acc: 94.760 
+learning rate: [0.07787447196714435]
+================ Train on the train set ================
+Epoch [53/170] |	Loss: 2.444 	Average Acc: 94.792 
+learning rate: [0.07710266782362254]
+================ Train on the train set ================
+Epoch [54/170] |	Loss: 2.414 	Average Acc: 95.476 
+learning rate: [0.07632160814386786]
+================ Train on the train set ================
+Epoch [55/170] |	Loss: 2.424 	Average Acc: 95.801 
+learning rate: [0.07553155965904541]
+================ Train on the train set ================
+Epoch [56/170] |	Loss: 2.442 	Average Acc: 95.427 
+learning rate: [0.07473279216998902]
+================ Train on the train set ================
+Epoch [57/170] |	Loss: 2.445 	Average Acc: 95.313 
+learning rate: [0.0739255784550644]
+================ Train on the train set ================
+Epoch [58/170] |	Loss: 2.462 	Average Acc: 95.556 
+learning rate: [0.07311019417701574]
+================ Train on the train set ================
+Epoch [59/170] |	Loss: 2.470 	Average Acc: 95.068 
+================ Test on the test set ================
+ * Average Acc: 63.633 Best acc 66.157
+ Per-Task Acc:[48.36, 63.71, 78.83]
+learning rate: [0.072286917788827]
+================ Train on the train set ================
+Epoch [60/170] |	Loss: 2.406 	Average Acc: 96.013 
+learning rate: [0.07145603043863052]
+================ Train on the train set ================
+Epoch [61/170] |	Loss: 2.417 	Average Acc: 95.752 
+learning rate: [0.07061781587369526]
+================ Train on the train set ================
+Epoch [62/170] |	Loss: 2.384 	Average Acc: 96.291 
+learning rate: [0.0697725603435272]
+================ Train on the train set ================
+Epoch [63/170] |	Loss: 2.375 	Average Acc: 96.387 
+learning rate: [0.0689205525021156]
+================ Train on the train set ================
+Epoch [64/170] |	Loss: 2.367 	Average Acc: 97.185 
+learning rate: [0.06806208330935773]
+================ Train on the train set ================
+Epoch [65/170] |	Loss: 2.397 	Average Acc: 96.420 
+learning rate: [0.06719744593169648]
+================ Train on the train set ================
+Epoch [66/170] |	Loss: 2.417 	Average Acc: 95.867 
+learning rate: [0.06632693564200423]
+================ Train on the train set ================
+Epoch [67/170] |	Loss: 2.433 	Average Acc: 95.687 
+learning rate: [0.06545084971874744]
+================ Train on the train set ================
+Epoch [68/170] |	Loss: 2.420 	Average Acc: 96.209 
+learning rate: [0.06456948734446631]
+================ Train on the train set ================
+Epoch [69/170] |	Loss: 2.429 	Average Acc: 95.540 
+================ Test on the test set ================
+ * Average Acc: 63.253 Best acc 66.157
+ Per-Task Acc:[47.82, 63.51, 78.43]
+learning rate: [0.06368314950360422]
+================ Train on the train set ================
+Epoch [70/170] |	Loss: 2.412 	Average Acc: 96.094 
+learning rate: [0.06279213887972185]
+================ Train on the train set ================
+Epoch [71/170] |	Loss: 2.389 	Average Acc: 96.127 
+learning rate: [0.061896759752131]
+================ Train on the train set ================
+Epoch [72/170] |	Loss: 2.373 	Average Acc: 96.600 
+learning rate: [0.0609973178919835]
+================ Train on the train set ================
+Epoch [73/170] |	Loss: 2.364 	Average Acc: 97.088 
+learning rate: [0.06009412045785057]
+================ Train on the train set ================
+Epoch [74/170] |	Loss: 2.342 	Average Acc: 97.349 
+learning rate: [0.059187475890828574]
+================ Train on the train set ================
+Epoch [75/170] |	Loss: 2.334 	Average Acc: 97.349 
+learning rate: [0.058277693809206554]
+================ Train on the train set ================
+Epoch [76/170] |	Loss: 2.368 	Average Acc: 97.023 
+learning rate: [0.057365084902731935]
+================ Train on the train set ================
+Epoch [77/170] |	Loss: 2.355 	Average Acc: 96.843 
+learning rate: [0.05644996082651022]
+================ Train on the train set ================
+Epoch [78/170] |	Loss: 2.358 	Average Acc: 97.120 
+learning rate: [0.05553263409457509]
+================ Train on the train set ================
+Epoch [79/170] |	Loss: 2.360 	Average Acc: 97.089 
+================ Test on the test set ================
+ * Average Acc: 66.363 Best acc 66.363
+ Per-Task Acc:[51.92, 66.63, 80.54]
+learning rate: [0.05461341797316515]
+================ Train on the train set ================
+Epoch [80/170] |	Loss: 2.336 	Average Acc: 97.561 
+learning rate: [0.05369262637374375]
+================ Train on the train set ================
+Epoch [81/170] |	Loss: 2.364 	Average Acc: 96.990 
+learning rate: [0.05277057374579855]
+================ Train on the train set ================
+Epoch [82/170] |	Loss: 2.371 	Average Acc: 96.844 
+learning rate: [0.05184757496945729]
+================ Train on the train set ================
+Epoch [83/170] |	Loss: 2.367 	Average Acc: 96.746 
+learning rate: [0.05092394524795654]
+================ Train on the train set ================
+Epoch [84/170] |	Loss: 2.364 	Average Acc: 97.267 
+learning rate: [0.05000000000000005]
+================ Train on the train set ================
+Epoch [85/170] |	Loss: 2.327 	Average Acc: 97.528 
+learning rate: [0.04907605475204356]
+================ Train on the train set ================
+Epoch [86/170] |	Loss: 2.308 	Average Acc: 98.146 
+learning rate: [0.04815242503054281]
+================ Train on the train set ================
+Epoch [87/170] |	Loss: 2.299 	Average Acc: 98.195 
+learning rate: [0.04722942625420156]
+================ Train on the train set ================
+Epoch [88/170] |	Loss: 2.316 	Average Acc: 98.000 
+learning rate: [0.04630737362625635]
+================ Train on the train set ================
+Epoch [89/170] |	Loss: 2.306 	Average Acc: 98.472 
+================ Test on the test set ================
+ * Average Acc: 65.457 Best acc 66.363
+ Per-Task Acc:[50.4, 64.82, 81.15]
+learning rate: [0.045386582026834946]
+================ Train on the train set ================
+Epoch [90/170] |	Loss: 2.292 	Average Acc: 98.309 
+learning rate: [0.04446736590542501]
+================ Train on the train set ================
+Epoch [91/170] |	Loss: 2.292 	Average Acc: 98.960 
+learning rate: [0.04355003917348989]
+================ Train on the train set ================
+Epoch [92/170] |	Loss: 2.278 	Average Acc: 98.878 
+learning rate: [0.04263491509726818]
+================ Train on the train set ================
+Epoch [93/170] |	Loss: 2.274 	Average Acc: 98.992 
+learning rate: [0.041722306190793534]
+================ Train on the train set ================
+Epoch [94/170] |	Loss: 2.271 	Average Acc: 99.220 
+learning rate: [0.040812524109171515]
+================ Train on the train set ================
+Epoch [95/170] |	Loss: 2.277 	Average Acc: 99.057 
+learning rate: [0.039905879542149525]
+================ Train on the train set ================
+Epoch [96/170] |	Loss: 2.274 	Average Acc: 99.155 
+learning rate: [0.03900268210801661]
+================ Train on the train set ================
+Epoch [97/170] |	Loss: 2.271 	Average Acc: 99.171 
+learning rate: [0.03810324024786912]
+================ Train on the train set ================
+Epoch [98/170] |	Loss: 2.265 	Average Acc: 99.106 
+learning rate: [0.03720786112027826]
+================ Train on the train set ================
+Epoch [99/170] |	Loss: 2.266 	Average Acc: 99.041 
+================ Test on the test set ================
+ * Average Acc: 67.707 Best acc 67.707
+ Per-Task Acc:[51.2, 66.13, 85.79]
+learning rate: [0.0363168504963959]
+================ Train on the train set ================
+Epoch [100/170] |	Loss: 2.261 	Average Acc: 99.139 
+learning rate: [0.03543051265553381]
+================ Train on the train set ================
+Epoch [101/170] |	Loss: 2.270 	Average Acc: 99.122 
+learning rate: [0.034549150281252675]
+================ Train on the train set ================
+Epoch [102/170] |	Loss: 2.262 	Average Acc: 99.106 
+learning rate: [0.033673064357995885]
+================ Train on the train set ================
+Epoch [103/170] |	Loss: 2.275 	Average Acc: 99.106 
+learning rate: [0.03280255406830363]
+================ Train on the train set ================
+Epoch [104/170] |	Loss: 2.262 	Average Acc: 99.122 
+learning rate: [0.031937916690642394]
+================ Train on the train set ================
+Epoch [105/170] |	Loss: 2.268 	Average Acc: 99.236 
+learning rate: [0.03107944749788453]
+================ Train on the train set ================
+Epoch [106/170] |	Loss: 2.268 	Average Acc: 99.057 
+learning rate: [0.030227439656472916]
+================ Train on the train set ================
+Epoch [107/170] |	Loss: 2.267 	Average Acc: 99.155 
+learning rate: [0.02938218412630487]
+================ Train on the train set ================
+Epoch [108/170] |	Loss: 2.265 	Average Acc: 99.074 
+learning rate: [0.028543969561369613]
+================ Train on the train set ================
+Epoch [109/170] |	Loss: 2.264 	Average Acc: 99.025 
+================ Test on the test set ================
+ * Average Acc: 67.657 Best acc 67.707
+ Per-Task Acc:[51.86, 65.12, 85.99]
+learning rate: [0.027713082211173128]
+================ Train on the train set ================
+Epoch [110/170] |	Loss: 2.268 	Average Acc: 99.171 
+learning rate: [0.02688980582298438]
+================ Train on the train set ================
+Epoch [111/170] |	Loss: 2.273 	Average Acc: 99.106 
+learning rate: [0.02607442154493571]
+================ Train on the train set ================
+Epoch [112/170] |	Loss: 2.267 	Average Acc: 99.155 
+learning rate: [0.0252672078300111]
+================ Train on the train set ================
+Epoch [113/170] |	Loss: 2.267 	Average Acc: 99.285 
+learning rate: [0.024468440340954693]
+================ Train on the train set ================
+Epoch [114/170] |	Loss: 2.262 	Average Acc: 99.204 
+learning rate: [0.02367839185613223]
+================ Train on the train set ================
+Epoch [115/170] |	Loss: 2.265 	Average Acc: 99.220 
+learning rate: [0.022897332176377554]
+================ Train on the train set ================
+Epoch [116/170] |	Loss: 2.269 	Average Acc: 98.960 
+learning rate: [0.02212552803285575]
+================ Train on the train set ================
+Epoch [117/170] |	Loss: 2.261 	Average Acc: 99.220 
+learning rate: [0.02136324299597477]
+================ Train on the train set ================
+Epoch [118/170] |	Loss: 2.260 	Average Acc: 98.960 
+learning rate: [0.020610737385376377]
+================ Train on the train set ================
+Epoch [119/170] |	Loss: 2.267 	Average Acc: 99.057 
+================ Test on the test set ================
+ * Average Acc: 68.153 Best acc 68.153
+ Per-Task Acc:[51.64, 66.13, 86.69]
+learning rate: [0.01986826818103721]
+================ Train on the train set ================
+Epoch [120/170] |	Loss: 2.259 	Average Acc: 99.138 
+learning rate: [0.019136088935510383]
+================ Train on the train set ================
+Epoch [121/170] |	Loss: 2.266 	Average Acc: 99.188 
+learning rate: [0.01841444968733749]
+================ Train on the train set ================
+Epoch [122/170] |	Loss: 2.264 	Average Acc: 99.009 
+learning rate: [0.017703596875660668]
+================ Train on the train set ================
+Epoch [123/170] |	Loss: 2.269 	Average Acc: 99.106 
+learning rate: [0.017003773256063906]
+================ Train on the train set ================
+Epoch [124/170] |	Loss: 2.265 	Average Acc: 98.976 
+learning rate: [0.01631521781767218]
+================ Train on the train set ================
+Epoch [125/170] |	Loss: 2.265 	Average Acc: 99.155 
+learning rate: [0.01563816570153689]
+================ Train on the train set ================
+Epoch [126/170] |	Loss: 2.266 	Average Acc: 99.155 
+learning rate: [0.014972848120335475]
+================ Train on the train set ================
+Epoch [127/170] |	Loss: 2.260 	Average Acc: 98.895 
+learning rate: [0.014319492279412408]
+================ Train on the train set ================
+Epoch [128/170] |	Loss: 2.264 	Average Acc: 99.074 
+learning rate: [0.01367832129918882]
+================ Train on the train set ================
+Epoch [129/170] |	Loss: 2.264 	Average Acc: 99.041 
+================ Test on the test set ================
+ * Average Acc: 68.427 Best acc 68.427
+ Per-Task Acc:[52.16, 66.53, 86.59]
+learning rate: [0.01304955413896707]
+================ Train on the train set ================
+Epoch [130/170] |	Loss: 2.268 	Average Acc: 99.187 
+learning rate: [0.012433405522156351]
+================ Train on the train set ================
+Epoch [131/170] |	Loss: 2.261 	Average Acc: 99.009 
+learning rate: [0.011830085862944869]
+================ Train on the train set ================
+Epoch [132/170] |	Loss: 2.266 	Average Acc: 99.187 
+learning rate: [0.011239801194443523]
+================ Train on the train set ================
+Epoch [133/170] |	Loss: 2.261 	Average Acc: 98.944 
+learning rate: [0.010662753098325855]
+================ Train on the train set ================
+Epoch [134/170] |	Loss: 2.267 	Average Acc: 99.155 
+learning rate: [0.01009913863598804]
+================ Train on the train set ================
+Epoch [135/170] |	Loss: 2.256 	Average Acc: 99.139 
+learning rate: [0.009549150281252647]
+================ Train on the train set ================
+Epoch [136/170] |	Loss: 2.260 	Average Acc: 99.106 
+learning rate: [0.009012975854638963]
+================ Train on the train set ================
+Epoch [137/170] |	Loss: 2.265 	Average Acc: 99.204 
+learning rate: [0.008490798459222489]
+================ Train on the train set ================
+Epoch [138/170] |	Loss: 2.261 	Average Acc: 99.122 
+learning rate: [0.007982796418105382]
+================ Train on the train set ================
+Epoch [139/170] |	Loss: 2.269 	Average Acc: 99.155 
+================ Test on the test set ================
+ * Average Acc: 67.833 Best acc 68.427
+ Per-Task Acc:[51.98, 65.73, 85.79]
+learning rate: [0.007489143213519312]
+================ Train on the train set ================
+Epoch [140/170] |	Loss: 2.272 	Average Acc: 99.139 
+learning rate: [0.0070100074275813995]
+================ Train on the train set ================
+Epoch [141/170] |	Loss: 2.266 	Average Acc: 98.992 
+learning rate: [0.0065455526847235925]
+================ Train on the train set ================
+Epoch [142/170] |	Loss: 2.263 	Average Acc: 99.090 
+learning rate: [0.0060959375958151134]
+================ Train on the train set ================
+Epoch [143/170] |	Loss: 2.262 	Average Acc: 99.122 
+learning rate: [0.005661315703996914]
+================ Train on the train set ================
+Epoch [144/170] |	Loss: 2.263 	Average Acc: 99.009 
+learning rate: [0.0052418354322468965]
+================ Train on the train set ================
+Epoch [145/170] |	Loss: 2.265 	Average Acc: 99.187 
+learning rate: [0.0048376400326935656]
+================ Train on the train set ================
+Epoch [146/170] |	Loss: 2.259 	Average Acc: 99.041 
+learning rate: [0.0044488675376955856]
+================ Train on the train set ================
+Epoch [147/170] |	Loss: 2.260 	Average Acc: 99.025 
+learning rate: [0.004075650712703856]
+================ Train on the train set ================
+Epoch [148/170] |	Loss: 2.265 	Average Acc: 99.204 
+learning rate: [0.0037181170109221906]
+================ Train on the train set ================
+Epoch [149/170] |	Loss: 2.270 	Average Acc: 99.073 
+================ Test on the test set ================
+ * Average Acc: 68.040 Best acc 68.427
+ Per-Task Acc:[51.9, 66.03, 86.19]
+learning rate: [0.003376388529782215]
+================ Train on the train set ================
+Epoch [150/170] |	Loss: 2.265 	Average Acc: 99.382 
+learning rate: [0.0030505819692471787]
+================ Train on the train set ================
+Epoch [151/170] |	Loss: 2.270 	Average Acc: 99.123 
+learning rate: [0.0027408085919590312]
+================ Train on the train set ================
+Epoch [152/170] |	Loss: 2.263 	Average Acc: 99.155 
+learning rate: [0.002447174185242328]
+================ Train on the train set ================
+Epoch [153/170] |	Loss: 2.266 	Average Acc: 99.025 
+learning rate: [0.0021697790249779673]
+================ Train on the train set ================
+Epoch [154/170] |	Loss: 2.269 	Average Acc: 99.122 
+learning rate: [0.0019087178413590509]
+================ Train on the train set ================
+Epoch [155/170] |	Loss: 2.260 	Average Acc: 99.090 
+learning rate: [0.0016640797865406314]
+================ Train on the train set ================
+Epoch [156/170] |	Loss: 2.264 	Average Acc: 99.155 
+learning rate: [0.0014359484041943117]
+================ Train on the train set ================
+Epoch [157/170] |	Loss: 2.262 	Average Acc: 99.041 
+learning rate: [0.0012244016009781721]
+================ Train on the train set ================
+Epoch [158/170] |	Loss: 2.268 	Average Acc: 99.301 
+learning rate: [0.0010295116199317074]
+================ Train on the train set ================
+Epoch [159/170] |	Loss: 2.259 	Average Acc: 99.204 
+================ Test on the test set ================
+ * Average Acc: 68.067 Best acc 68.427
+ Per-Task Acc:[51.78, 65.93, 86.49]
+learning rate: [0.0008513450158049123]
+================ Train on the train set ================
+Epoch [160/170] |	Loss: 2.256 	Average Acc: 99.252 
+learning rate: [0.0006899626323298725]
+================ Train on the train set ================
+Epoch [161/170] |	Loss: 2.265 	Average Acc: 99.057 
+learning rate: [0.000545419581442703]
+================ Train on the train set ================
+Epoch [162/170] |	Loss: 2.261 	Average Acc: 99.139 
+learning rate: [0.0004177652244628634]
+================ Train on the train set ================
+Epoch [163/170] |	Loss: 2.269 	Average Acc: 99.041 
+learning rate: [0.00030704315523632006]
+================ Train on the train set ================
+Epoch [164/170] |	Loss: 2.261 	Average Acc: 99.252 
+learning rate: [0.00021329118524827698]
+================ Train on the train set ================
+Epoch [165/170] |	Loss: 2.260 	Average Acc: 99.187 
+learning rate: [0.00013654133071059918]
+================ Train on the train set ================
+Epoch [166/170] |	Loss: 2.261 	Average Acc: 99.171 
+learning rate: [7.681980162830296e-05]
+================ Train on the train set ================
+Epoch [167/170] |	Loss: 2.260 	Average Acc: 99.317 
+learning rate: [3.414699284885476e-05]
+================ Train on the train set ================
+Epoch [168/170] |	Loss: 2.260 	Average Acc: 99.204 
+learning rate: [8.537477097364536e-06]
+================ Train on the train set ================
+Epoch [169/170] |	Loss: 2.270 	Average Acc: 99.220 
+================ Test on the test set ================
+ * Average Acc: 68.113 Best acc 68.427
+ Per-Task Acc:[51.82, 66.03, 86.49]
+do not weight align teacher!
+per cls weights : [1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816 1.08422816
+ 0.49463102 0.49463102 0.49463102 0.49463102 0.49463102 0.49463102
+ 0.49463102 0.49463102 0.49463102 0.49463102]
+SNet: Task 2, Epoch 1/130 => Loss 2.147,  Train_accy 68.20, Test_accy 50.33
+SNet: Task 2, Epoch 2/130 => Loss 1.874,  Train_accy 81.48
+SNet: Task 2, Epoch 3/130 => Loss 1.837,  Train_accy 83.60
+SNet: Task 2, Epoch 4/130 => Loss 1.802,  Train_accy 86.40
+SNet: Task 2, Epoch 5/130 => Loss 1.789,  Train_accy 88.02
+SNet: Task 2, Epoch 6/130 => Loss 1.772,  Train_accy 88.03, Test_accy 54.57
+SNet: Task 2, Epoch 7/130 => Loss 1.759,  Train_accy 89.52
+SNet: Task 2, Epoch 8/130 => Loss 1.753,  Train_accy 89.80
+SNet: Task 2, Epoch 9/130 => Loss 1.750,  Train_accy 90.25
+SNet: Task 2, Epoch 10/130 => Loss 1.740,  Train_accy 91.26
+SNet: Task 2, Epoch 11/130 => Loss 1.733,  Train_accy 91.39, Test_accy 54.85
+SNet: Task 2, Epoch 12/130 => Loss 1.721,  Train_accy 92.28
+SNet: Task 2, Epoch 13/130 => Loss 1.724,  Train_accy 91.99
+SNet: Task 2, Epoch 14/130 => Loss 1.712,  Train_accy 92.70
+SNet: Task 2, Epoch 15/130 => Loss 1.705,  Train_accy 93.17
+SNet: Task 2, Epoch 16/130 => Loss 1.710,  Train_accy 92.75, Test_accy 55.75
+SNet: Task 2, Epoch 17/130 => Loss 1.697,  Train_accy 92.86
+SNet: Task 2, Epoch 18/130 => Loss 1.697,  Train_accy 93.54
+SNet: Task 2, Epoch 19/130 => Loss 1.697,  Train_accy 93.36
+SNet: Task 2, Epoch 20/130 => Loss 1.696,  Train_accy 93.77
+SNet: Task 2, Epoch 21/130 => Loss 1.686,  Train_accy 93.56, Test_accy 55.88
+SNet: Task 2, Epoch 22/130 => Loss 1.691,  Train_accy 94.07
+SNet: Task 2, Epoch 23/130 => Loss 1.686,  Train_accy 94.43
+SNet: Task 2, Epoch 24/130 => Loss 1.683,  Train_accy 94.24
+SNet: Task 2, Epoch 25/130 => Loss 1.688,  Train_accy 94.30
+SNet: Task 2, Epoch 26/130 => Loss 1.684,  Train_accy 94.17, Test_accy 56.88
+SNet: Task 2, Epoch 27/130 => Loss 1.679,  Train_accy 94.59
+SNet: Task 2, Epoch 28/130 => Loss 1.677,  Train_accy 94.43
+SNet: Task 2, Epoch 29/130 => Loss 1.679,  Train_accy 94.53
+SNet: Task 2, Epoch 30/130 => Loss 1.686,  Train_accy 95.00
+SNet: Task 2, Epoch 31/130 => Loss 1.677,  Train_accy 94.79, Test_accy 57.33
+SNet: Task 2, Epoch 32/130 => Loss 1.664,  Train_accy 94.79
+SNet: Task 2, Epoch 33/130 => Loss 1.672,  Train_accy 94.72
+SNet: Task 2, Epoch 34/130 => Loss 1.671,  Train_accy 95.05
+SNet: Task 2, Epoch 35/130 => Loss 1.671,  Train_accy 95.45
+SNet: Task 2, Epoch 36/130 => Loss 1.674,  Train_accy 94.98, Test_accy 56.94
+SNet: Task 2, Epoch 37/130 => Loss 1.665,  Train_accy 95.14
+SNet: Task 2, Epoch 38/130 => Loss 1.665,  Train_accy 95.51
+SNet: Task 2, Epoch 39/130 => Loss 1.666,  Train_accy 95.22
+SNet: Task 2, Epoch 40/130 => Loss 1.661,  Train_accy 94.95
+SNet: Task 2, Epoch 41/130 => Loss 1.665,  Train_accy 95.48, Test_accy 57.83
+SNet: Task 2, Epoch 42/130 => Loss 1.669,  Train_accy 95.53
+SNet: Task 2, Epoch 43/130 => Loss 1.673,  Train_accy 95.47
+SNet: Task 2, Epoch 44/130 => Loss 1.662,  Train_accy 95.11
+SNet: Task 2, Epoch 45/130 => Loss 1.664,  Train_accy 95.48
+SNet: Task 2, Epoch 46/130 => Loss 1.666,  Train_accy 95.51, Test_accy 57.77
+SNet: Task 2, Epoch 47/130 => Loss 1.660,  Train_accy 96.03
+SNet: Task 2, Epoch 48/130 => Loss 1.658,  Train_accy 95.55
+SNet: Task 2, Epoch 49/130 => Loss 1.659,  Train_accy 95.85
+SNet: Task 2, Epoch 50/130 => Loss 1.659,  Train_accy 95.74
+SNet: Task 2, Epoch 51/130 => Loss 1.663,  Train_accy 95.82, Test_accy 57.81
+SNet: Task 2, Epoch 52/130 => Loss 1.652,  Train_accy 96.18
+SNet: Task 2, Epoch 53/130 => Loss 1.657,  Train_accy 95.74
+SNet: Task 2, Epoch 54/130 => Loss 1.647,  Train_accy 95.74
+SNet: Task 2, Epoch 55/130 => Loss 1.653,  Train_accy 95.84
+SNet: Task 2, Epoch 56/130 => Loss 1.655,  Train_accy 95.84, Test_accy 58.51
+SNet: Task 2, Epoch 57/130 => Loss 1.651,  Train_accy 96.10
+SNet: Task 2, Epoch 58/130 => Loss 1.650,  Train_accy 96.05
+SNet: Task 2, Epoch 59/130 => Loss 1.654,  Train_accy 96.19
+SNet: Task 2, Epoch 60/130 => Loss 1.655,  Train_accy 95.85
+SNet: Task 2, Epoch 61/130 => Loss 1.653,  Train_accy 96.29, Test_accy 58.39
+SNet: Task 2, Epoch 62/130 => Loss 1.649,  Train_accy 96.15
+SNet: Task 2, Epoch 63/130 => Loss 1.647,  Train_accy 95.95
+SNet: Task 2, Epoch 64/130 => Loss 1.651,  Train_accy 95.79
+SNet: Task 2, Epoch 65/130 => Loss 1.652,  Train_accy 96.36
+SNet: Task 2, Epoch 66/130 => Loss 1.649,  Train_accy 95.94, Test_accy 58.34
+SNet: Task 2, Epoch 67/130 => Loss 1.647,  Train_accy 96.07
+SNet: Task 2, Epoch 68/130 => Loss 1.649,  Train_accy 96.18
+SNet: Task 2, Epoch 69/130 => Loss 1.645,  Train_accy 96.21
+SNet: Task 2, Epoch 70/130 => Loss 1.651,  Train_accy 96.26
+SNet: Task 2, Epoch 71/130 => Loss 1.656,  Train_accy 96.26, Test_accy 58.24
+SNet: Task 2, Epoch 72/130 => Loss 1.646,  Train_accy 96.15
+SNet: Task 2, Epoch 73/130 => Loss 1.650,  Train_accy 96.13
+SNet: Task 2, Epoch 74/130 => Loss 1.648,  Train_accy 96.16
+SNet: Task 2, Epoch 75/130 => Loss 1.650,  Train_accy 96.07
+SNet: Task 2, Epoch 76/130 => Loss 1.644,  Train_accy 96.00, Test_accy 58.36
+SNet: Task 2, Epoch 77/130 => Loss 1.648,  Train_accy 96.21
+SNet: Task 2, Epoch 78/130 => Loss 1.648,  Train_accy 96.13
+SNet: Task 2, Epoch 79/130 => Loss 1.639,  Train_accy 96.52
+SNet: Task 2, Epoch 80/130 => Loss 1.639,  Train_accy 96.47
+SNet: Task 2, Epoch 81/130 => Loss 1.643,  Train_accy 96.29, Test_accy 58.82
+SNet: Task 2, Epoch 82/130 => Loss 1.640,  Train_accy 96.21
+SNet: Task 2, Epoch 83/130 => Loss 1.649,  Train_accy 96.02
+SNet: Task 2, Epoch 84/130 => Loss 1.638,  Train_accy 96.31
+SNet: Task 2, Epoch 85/130 => Loss 1.642,  Train_accy 96.65
+SNet: Task 2, Epoch 86/130 => Loss 1.643,  Train_accy 96.07, Test_accy 58.72
+SNet: Task 2, Epoch 87/130 => Loss 1.639,  Train_accy 96.29
+SNet: Task 2, Epoch 88/130 => Loss 1.640,  Train_accy 96.11
+SNet: Task 2, Epoch 89/130 => Loss 1.636,  Train_accy 96.36
+SNet: Task 2, Epoch 90/130 => Loss 1.642,  Train_accy 95.98
+SNet: Task 2, Epoch 91/130 => Loss 1.639,  Train_accy 96.24, Test_accy 58.89
+SNet: Task 2, Epoch 92/130 => Loss 1.650,  Train_accy 96.44
+SNet: Task 2, Epoch 93/130 => Loss 1.638,  Train_accy 96.31
+SNet: Task 2, Epoch 94/130 => Loss 1.645,  Train_accy 95.98
+SNet: Task 2, Epoch 95/130 => Loss 1.644,  Train_accy 96.60
+SNet: Task 2, Epoch 96/130 => Loss 1.636,  Train_accy 96.28, Test_accy 58.92
+SNet: Task 2, Epoch 97/130 => Loss 1.633,  Train_accy 96.24
+SNet: Task 2, Epoch 98/130 => Loss 1.638,  Train_accy 96.05
+SNet: Task 2, Epoch 99/130 => Loss 1.638,  Train_accy 95.95
+SNet: Task 2, Epoch 100/130 => Loss 1.640,  Train_accy 96.32
+SNet: Task 2, Epoch 101/130 => Loss 1.644,  Train_accy 96.13, Test_accy 58.39
+SNet: Task 2, Epoch 102/130 => Loss 1.638,  Train_accy 96.63
+SNet: Task 2, Epoch 103/130 => Loss 1.640,  Train_accy 96.34
+SNet: Task 2, Epoch 104/130 => Loss 1.639,  Train_accy 96.50
+SNet: Task 2, Epoch 105/130 => Loss 1.639,  Train_accy 96.31
+SNet: Task 2, Epoch 106/130 => Loss 1.641,  Train_accy 96.44, Test_accy 59.02
+SNet: Task 2, Epoch 107/130 => Loss 1.637,  Train_accy 96.42
+SNet: Task 2, Epoch 108/130 => Loss 1.642,  Train_accy 96.37
+SNet: Task 2, Epoch 109/130 => Loss 1.632,  Train_accy 96.15
+SNet: Task 2, Epoch 110/130 => Loss 1.638,  Train_accy 96.53
+SNet: Task 2, Epoch 111/130 => Loss 1.634,  Train_accy 96.08, Test_accy 59.05
+SNet: Task 2, Epoch 112/130 => Loss 1.644,  Train_accy 96.45
+SNet: Task 2, Epoch 113/130 => Loss 1.639,  Train_accy 96.23
+SNet: Task 2, Epoch 114/130 => Loss 1.638,  Train_accy 96.44
+SNet: Task 2, Epoch 115/130 => Loss 1.642,  Train_accy 96.44
+SNet: Task 2, Epoch 116/130 => Loss 1.646,  Train_accy 96.45, Test_accy 58.86
+SNet: Task 2, Epoch 117/130 => Loss 1.643,  Train_accy 96.75
+SNet: Task 2, Epoch 118/130 => Loss 1.644,  Train_accy 96.24
+SNet: Task 2, Epoch 119/130 => Loss 1.643,  Train_accy 96.47
+SNet: Task 2, Epoch 120/130 => Loss 1.634,  Train_accy 96.57
+SNet: Task 2, Epoch 121/130 => Loss 1.636,  Train_accy 96.60, Test_accy 58.83
+SNet: Task 2, Epoch 122/130 => Loss 1.638,  Train_accy 96.47
+SNet: Task 2, Epoch 123/130 => Loss 1.634,  Train_accy 96.36
+SNet: Task 2, Epoch 124/130 => Loss 1.634,  Train_accy 96.45
+SNet: Task 2, Epoch 125/130 => Loss 1.632,  Train_accy 96.39
+SNet: Task 2, Epoch 126/130 => Loss 1.637,  Train_accy 96.70, Test_accy 58.64
+SNet: Task 2, Epoch 127/130 => Loss 1.640,  Train_accy 96.29
+SNet: Task 2, Epoch 128/130 => Loss 1.634,  Train_accy 96.26
+SNet: Task 2, Epoch 129/130 => Loss 1.635,  Train_accy 96.63
+SNet: Task 2, Epoch 130/130 => Loss 1.642,  Train_accy 96.62
+do not weight align student!
+darknet eval: 
+CNN top1 curve: 58.40022935779817
+Construct examplars for class 0
+Construct examplars for class 1
+Construct examplars for class 2
+Construct examplars for class 3
+Construct examplars for class 4
+Construct examplars for class 5
+Construct examplars for class 6
+Construct examplars for class 7
+Construct examplars for class 8
+Construct examplars for class 9
+Construct examplars for class 10
+Construct examplars for class 11
+Construct examplars for class 12
+Construct examplars for class 13
+Construct examplars for class 14
+Construct examplars for class 15
+Construct examplars for class 16
+Construct examplars for class 17
+Construct examplars for class 18
+Construct examplars for class 19
+Construct examplars for class 20
+Construct examplars for class 21
+Construct examplars for class 22
+Construct examplars for class 23
+Construct examplars for class 24
+Construct examplars for class 25
+Construct examplars for class 26
+Construct examplars for class 27
+Construct examplars for class 28
+Construct examplars for class 29
+Construct examplars for class 30
+Construct examplars for class 31
+Construct examplars for class 32
+Construct examplars for class 33
+Construct examplars for class 34
+Construct examplars for class 35
+Construct examplars for class 36
+Construct examplars for class 37
+Construct examplars for class 38
+Construct examplars for class 39
+Construct examplars for class 40
+Construct examplars for class 41
+Construct examplars for class 42
+Construct examplars for class 43
+Construct examplars for class 44
+Construct examplars for class 45
+Construct examplars for class 46
+Construct examplars for class 47
+Construct examplars for class 48
+Construct examplars for class 49
+Construct examplars for class 50
+Construct examplars for class 51
+Construct examplars for class 52
+Construct examplars for class 53
+Construct examplars for class 54
+Construct examplars for class 55
+Construct examplars for class 56
+Construct examplars for class 57
+Construct examplars for class 58
+Construct examplars for class 59
+Construct examplars for class 60
+Construct examplars for class 61
+Construct examplars for class 62
+Construct examplars for class 63
+Construct examplars for class 64
+Construct examplars for class 65
+Construct examplars for class 66
+Construct examplars for class 67
+Construct examplars for class 68
+Construct examplars for class 69
+================Task 3 Start!================
+Trainable params in the model: 477734
+Learning on 70-80
+per cls weights : [1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779 1.03762779
+ 1.03762779 1.03762779 1.03762779 1.03762779 0.73660549 0.73660549
+ 0.73660549 0.73660549 0.73660549 0.73660549 0.73660549 0.73660549
+ 0.73660549 0.73660549]
+SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    maximize: False
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0005
+)
+================Task 3 Training!================
+The training samples number: 6400
+learning rate: [0.1]
+================ Train on the train set ================
+Epoch [0/170] |	Loss: 5.824 	Average Acc: 61.484 
+learning rate: [0.09999146252290264]
+================ Train on the train set ================
+Epoch [1/170] |	Loss: 4.006 	Average Acc: 71.906 
+learning rate: [0.09996585300715116]
+================ Train on the train set ================
+Epoch [2/170] |	Loss: 3.497 	Average Acc: 74.547 
+learning rate: [0.09992318019837171]
+================ Train on the train set ================
+Epoch [3/170] |	Loss: 3.222 	Average Acc: 77.062 
+learning rate: [0.09986345866928942]
+================ Train on the train set ================
+Epoch [4/170] |	Loss: 3.131 	Average Acc: 77.735 
+learning rate: [0.09978670881475173]
+================ Train on the train set ================
+Epoch [5/170] |	Loss: 3.061 	Average Acc: 78.625 
+learning rate: [0.0996929568447637]
+================ Train on the train set ================
+Epoch [6/170] |	Loss: 2.953 	Average Acc: 81.218 
+learning rate: [0.09958223477553715]
+================ Train on the train set ================
+Epoch [7/170] |	Loss: 2.878 	Average Acc: 82.766 
+learning rate: [0.09945458041855731]
+================ Train on the train set ================
+Epoch [8/170] |	Loss: 2.836 	Average Acc: 83.235 
+learning rate: [0.09931003736767013]
+================ Train on the train set ================
+Epoch [9/170] |	Loss: 2.845 	Average Acc: 83.704 
+================ Test on the test set ================
+ * Average Acc: 55.560 Best acc 55.560
+ Per-Task Acc:[37.36, 44.05, 73.49, 67.34]
+learning rate: [0.0991486549841951]
+================ Train on the train set ================
+Epoch [10/170] |	Loss: 2.760 	Average Acc: 85.312 
+learning rate: [0.0989704883800683]
+================ Train on the train set ================
+Epoch [11/170] |	Loss: 2.750 	Average Acc: 85.657 
+learning rate: [0.09877559839902185]
+================ Train on the train set ================
+Epoch [12/170] |	Loss: 2.750 	Average Acc: 85.782 
+learning rate: [0.09856405159580571]
+================ Train on the train set ================
+Epoch [13/170] |	Loss: 2.733 	Average Acc: 86.079 
+learning rate: [0.0983359202134594]
+================ Train on the train set ================
+Epoch [14/170] |	Loss: 2.785 	Average Acc: 85.344 
+learning rate: [0.09809128215864098]
+================ Train on the train set ================
+Epoch [15/170] |	Loss: 2.776 	Average Acc: 86.078 
+learning rate: [0.09783022097502206]
+================ Train on the train set ================
+Epoch [16/170] |	Loss: 2.767 	Average Acc: 86.187 
+learning rate: [0.0975528258147577]
+================ Train on the train set ================
+Epoch [17/170] |	Loss: 2.756 	Average Acc: 86.829 
+learning rate: [0.097259191408041]
+================ Train on the train set ================
+Epoch [18/170] |	Loss: 2.676 	Average Acc: 88.468 
+learning rate: [0.09694941803075285]
+================ Train on the train set ================
+Epoch [19/170] |	Loss: 2.683 	Average Acc: 88.171 
+================ Test on the test set ================
+ * Average Acc: 58.583 Best acc 58.583
+ Per-Task Acc:[40.28, 50.1, 73.79, 70.16]
+learning rate: [0.09662361147021781]
+================ Train on the train set ================
+Epoch [20/170] |	Loss: 2.690 	Average Acc: 88.265 
+learning rate: [0.09628188298907785]
+================ Train on the train set ================
+Epoch [21/170] |	Loss: 2.750 	Average Acc: 87.796 
+learning rate: [0.09592434928729618]
+================ Train on the train set ================
+Epoch [22/170] |	Loss: 2.702 	Average Acc: 87.265 
+learning rate: [0.09555113246230446]
+================ Train on the train set ================
+Epoch [23/170] |	Loss: 2.650 	Average Acc: 89.360 
+learning rate: [0.09516235996730647]
+================ Train on the train set ================
+Epoch [24/170] |	Loss: 2.652 	Average Acc: 88.999 
+learning rate: [0.09475816456775316]
+================ Train on the train set ================
+Epoch [25/170] |	Loss: 2.626 	Average Acc: 90.015 
+learning rate: [0.09433868429600312]
+================ Train on the train set ================
+Epoch [26/170] |	Loss: 2.735 	Average Acc: 88.265 
+learning rate: [0.09390406240418492]
+================ Train on the train set ================
+Epoch [27/170] |	Loss: 2.688 	Average Acc: 89.266 
+learning rate: [0.09345444731527644]
+================ Train on the train set ================
+Epoch [28/170] |	Loss: 2.627 	Average Acc: 89.984 
+learning rate: [0.09298999257241865]
+================ Train on the train set ================
+Epoch [29/170] |	Loss: 2.614 	Average Acc: 90.140 
+================ Test on the test set ================
+ * Average Acc: 58.180 Best acc 58.583
+ Per-Task Acc:[41.19, 48.99, 77.12, 65.42]
+learning rate: [0.09251085678648074]
+================ Train on the train set ================
+Epoch [30/170] |	Loss: 2.639 	Average Acc: 89.547 
+learning rate: [0.09201720358189468]
+================ Train on the train set ================
+Epoch [31/170] |	Loss: 2.620 	Average Acc: 90.140 
+learning rate: [0.09150920154077757]
+================ Train on the train set ================
+Epoch [32/170] |	Loss: 2.611 	Average Acc: 90.531 
+learning rate: [0.09098702414536111]
+================ Train on the train set ================
+Epoch [33/170] |	Loss: 2.631 	Average Acc: 89.547 
+learning rate: [0.09045084971874742]
+================ Train on the train set ================
+Epoch [34/170] |	Loss: 2.647 	Average Acc: 89.797 
+learning rate: [0.08990086136401203]
+================ Train on the train set ================
+Epoch [35/170] |	Loss: 2.550 	Average Acc: 91.343 
+learning rate: [0.0893372469016742]
+================ Train on the train set ================
+Epoch [36/170] |	Loss: 2.562 	Average Acc: 91.640 
+learning rate: [0.08876019880555654]
+================ Train on the train set ================
+Epoch [37/170] |	Loss: 2.662 	Average Acc: 89.749 
+learning rate: [0.0881699141370552]
+================ Train on the train set ================
+Epoch [38/170] |	Loss: 2.634 	Average Acc: 90.469 
+learning rate: [0.08756659447784372]
+================ Train on the train set ================
+Epoch [39/170] |	Loss: 2.670 	Average Acc: 89.891 
+================ Test on the test set ================
+ * Average Acc: 51.530 Best acc 58.583
+ Per-Task Acc:[32.13, 41.33, 67.64, 65.02]
+learning rate: [0.08695044586103301]
+================ Train on the train set ================
+Epoch [40/170] |	Loss: 2.635 	Average Acc: 90.422 
+learning rate: [0.08632167870081127]
+================ Train on the train set ================
+Epoch [41/170] |	Loss: 2.607 	Average Acc: 90.562 
+learning rate: [0.08568050772058768]
+================ Train on the train set ================
+Epoch [42/170] |	Loss: 2.576 	Average Acc: 91.953 
+learning rate: [0.0850271518796646]
+================ Train on the train set ================
+Epoch [43/170] |	Loss: 2.528 	Average Acc: 91.906 
+learning rate: [0.0843618342984632]
+================ Train on the train set ================
+Epoch [44/170] |	Loss: 2.508 	Average Acc: 93.172 
+learning rate: [0.08368478218232793]
+================ Train on the train set ================
+Epoch [45/170] |	Loss: 2.533 	Average Acc: 92.672 
+learning rate: [0.08299622674393621]
+================ Train on the train set ================
+Epoch [46/170] |	Loss: 2.514 	Average Acc: 93.594 
+learning rate: [0.08229640312433945]
+================ Train on the train set ================
+Epoch [47/170] |	Loss: 2.552 	Average Acc: 92.156 
+learning rate: [0.08158555031266262]
+================ Train on the train set ================
+Epoch [48/170] |	Loss: 2.539 	Average Acc: 92.718 
+learning rate: [0.08086391106448973]
+================ Train on the train set ================
+Epoch [49/170] |	Loss: 2.501 	Average Acc: 93.344 
+================ Test on the test set ================
+ * Average Acc: 54.403 Best acc 58.583
+ Per-Task Acc:[34.54, 39.72, 69.86, 73.49]
+learning rate: [0.08013173181896291]
+================ Train on the train set ================
+Epoch [50/170] |	Loss: 2.533 	Average Acc: 92.531 
+learning rate: [0.07938926261462374]
+================ Train on the train set ================
+Epoch [51/170] |	Loss: 2.510 	Average Acc: 92.672 
+learning rate: [0.07863675700402534]
+================ Train on the train set ================
+Epoch [52/170] |	Loss: 2.558 	Average Acc: 91.875 
+learning rate: [0.07787447196714435]
+================ Train on the train set ================
+Epoch [53/170] |	Loss: 2.520 	Average Acc: 93.218 
+learning rate: [0.07710266782362254]
+================ Train on the train set ================
+Epoch [54/170] |	Loss: 2.495 	Average Acc: 92.938 
+learning rate: [0.07632160814386786]
+================ Train on the train set ================
+Epoch [55/170] |	Loss: 2.499 	Average Acc: 93.218 
+learning rate: [0.07553155965904541]
+================ Train on the train set ================
+Epoch [56/170] |	Loss: 2.500 	Average Acc: 93.453 
+learning rate: [0.07473279216998902]
+================ Train on the train set ================
+Epoch [57/170] |	Loss: 2.497 	Average Acc: 93.155 
+learning rate: [0.0739255784550644]
+================ Train on the train set ================
+Epoch [58/170] |	Loss: 2.483 	Average Acc: 94.406 
+learning rate: [0.07311019417701574]
+================ Train on the train set ================
+Epoch [59/170] |	Loss: 2.472 	Average Acc: 93.922 
+================ Test on the test set ================
+ * Average Acc: 54.098 Best acc 58.583
+ Per-Task Acc:[35.94, 40.02, 70.87, 69.56]
+learning rate: [0.072286917788827]
+================ Train on the train set ================
+Epoch [60/170] |	Loss: 2.445 	Average Acc: 94.391 
+learning rate: [0.07145603043863052]
+================ Train on the train set ================
+Epoch [61/170] |	Loss: 2.454 	Average Acc: 94.641 
+learning rate: [0.07061781587369526]
+================ Train on the train set ================
+Epoch [62/170] |	Loss: 2.461 	Average Acc: 95.063 
+learning rate: [0.0697725603435272]
+================ Train on the train set ================
+Epoch [63/170] |	Loss: 2.498 	Average Acc: 93.719 
+learning rate: [0.0689205525021156]
+================ Train on the train set ================
+Epoch [64/170] |	Loss: 2.490 	Average Acc: 93.844 
+learning rate: [0.06806208330935773]
+================ Train on the train set ================
+Epoch [65/170] |	Loss: 2.472 	Average Acc: 94.235 
+learning rate: [0.06719744593169648]
+================ Train on the train set ================
+Epoch [66/170] |	Loss: 2.501 	Average Acc: 93.766 
+learning rate: [0.06632693564200423]
+================ Train on the train set ================
+Epoch [67/170] |	Loss: 2.534 	Average Acc: 92.624 
+learning rate: [0.06545084971874744]
+================ Train on the train set ================
+Epoch [68/170] |	Loss: 2.444 	Average Acc: 94.859 
+learning rate: [0.06456948734446631]
+================ Train on the train set ================
+Epoch [69/170] |	Loss: 2.402 	Average Acc: 96.064 
+================ Test on the test set ================
+ * Average Acc: 56.205 Best acc 58.583
+ Per-Task Acc:[36.32, 43.95, 66.53, 78.02]
+learning rate: [0.06368314950360422]
+================ Train on the train set ================
+Epoch [70/170] |	Loss: 2.419 	Average Acc: 95.437 
+learning rate: [0.06279213887972185]
+================ Train on the train set ================
+Epoch [71/170] |	Loss: 2.412 	Average Acc: 95.626 
+learning rate: [0.061896759752131]
+================ Train on the train set ================
+Epoch [72/170] |	Loss: 2.366 	Average Acc: 96.594 
+learning rate: [0.0609973178919835]
+================ Train on the train set ================
+Epoch [73/170] |	Loss: 2.402 	Average Acc: 95.876 
+learning rate: [0.06009412045785057]
+================ Train on the train set ================
+Epoch [74/170] |	Loss: 2.379 	Average Acc: 96.079 
+learning rate: [0.059187475890828574]
+================ Train on the train set ================
+Epoch [75/170] |	Loss: 2.426 	Average Acc: 95.688 
+learning rate: [0.058277693809206554]
+================ Train on the train set ================
+Epoch [76/170] |	Loss: 2.386 	Average Acc: 96.297 
+learning rate: [0.057365084902731935]
+================ Train on the train set ================
+Epoch [77/170] |	Loss: 2.363 	Average Acc: 96.720 
+learning rate: [0.05644996082651022]
+================ Train on the train set ================
+Epoch [78/170] |	Loss: 2.373 	Average Acc: 96.955 
+learning rate: [0.05553263409457509]
+================ Train on the train set ================
+Epoch [79/170] |	Loss: 2.381 	Average Acc: 95.719 
+================ Test on the test set ================
+ * Average Acc: 55.815 Best acc 58.583
+ Per-Task Acc:[38.48, 42.74, 67.54, 74.5]
+learning rate: [0.05461341797316515]
+================ Train on the train set ================
+Epoch [80/170] |	Loss: 2.370 	Average Acc: 96.767 
+learning rate: [0.05369262637374375]
+================ Train on the train set ================
+Epoch [81/170] |	Loss: 2.372 	Average Acc: 96.470 
+learning rate: [0.05277057374579855]
+================ Train on the train set ================
+Epoch [82/170] |	Loss: 2.413 	Average Acc: 96.017 
+learning rate: [0.05184757496945729]
+================ Train on the train set ================
+Epoch [83/170] |	Loss: 2.368 	Average Acc: 96.282 
+learning rate: [0.05092394524795654]
+================ Train on the train set ================
+Epoch [84/170] |	Loss: 2.323 	Average Acc: 97.346 
+learning rate: [0.05000000000000005]
+================ Train on the train set ================
+Epoch [85/170] |	Loss: 2.322 	Average Acc: 97.940 
+learning rate: [0.04907605475204356]
+================ Train on the train set ================
+Epoch [86/170] |	Loss: 2.305 	Average Acc: 97.767 
+learning rate: [0.04815242503054281]
+================ Train on the train set ================
+Epoch [87/170] |	Loss: 2.292 	Average Acc: 98.376 
+learning rate: [0.04722942625420156]
+================ Train on the train set ================
+Epoch [88/170] |	Loss: 2.293 	Average Acc: 98.455 
+learning rate: [0.04630737362625635]
+================ Train on the train set ================
+Epoch [89/170] |	Loss: 2.289 	Average Acc: 98.361 
+================ Test on the test set ================
+ * Average Acc: 54.095 Best acc 58.583
+ Per-Task Acc:[34.42, 37.5, 65.02, 79.44]
+learning rate: [0.045386582026834946]
+================ Train on the train set ================
+Epoch [90/170] |	Loss: 2.314 	Average Acc: 97.846 
+learning rate: [0.04446736590542501]
+================ Train on the train set ================
+Epoch [91/170] |	Loss: 2.308 	Average Acc: 98.424 
+learning rate: [0.04355003917348989]
+================ Train on the train set ================
+Epoch [92/170] |	Loss: 2.307 	Average Acc: 98.236 
+learning rate: [0.04263491509726818]
+================ Train on the train set ================
+Epoch [93/170] |	Loss: 2.321 	Average Acc: 97.861 
+learning rate: [0.041722306190793534]
+================ Train on the train set ================
+Epoch [94/170] |	Loss: 2.333 	Average Acc: 97.329 
+learning rate: [0.040812524109171515]
+================ Train on the train set ================
+Epoch [95/170] |	Loss: 2.328 	Average Acc: 97.689 
+learning rate: [0.039905879542149525]
+================ Train on the train set ================
+Epoch [96/170] |	Loss: 2.316 	Average Acc: 97.955 
+learning rate: [0.03900268210801661]
+================ Train on the train set ================
+Epoch [97/170] |	Loss: 2.318 	Average Acc: 97.768 
+learning rate: [0.03810324024786912]
+================ Train on the train set ================
+Epoch [98/170] |	Loss: 2.313 	Average Acc: 97.939 
+learning rate: [0.03720786112027826]
+================ Train on the train set ================
+Epoch [99/170] |	Loss: 2.295 	Average Acc: 98.564 
+================ Test on the test set ================
+ * Average Acc: 57.213 Best acc 58.583
+ Per-Task Acc:[38.02, 43.85, 69.56, 77.42]
+learning rate: [0.0363168504963959]
+================ Train on the train set ================
+Epoch [100/170] |	Loss: 2.312 	Average Acc: 98.345 
+learning rate: [0.03543051265553381]
+================ Train on the train set ================
+Epoch [101/170] |	Loss: 2.299 	Average Acc: 98.674 
+learning rate: [0.034549150281252675]
+================ Train on the train set ================
+Epoch [102/170] |	Loss: 2.290 	Average Acc: 98.830 
+learning rate: [0.033673064357995885]
+================ Train on the train set ================
+Epoch [103/170] |	Loss: 2.283 	Average Acc: 99.189 
+learning rate: [0.03280255406830363]
+================ Train on the train set ================
+Epoch [104/170] |	Loss: 2.272 	Average Acc: 99.017 
+learning rate: [0.031937916690642394]
+================ Train on the train set ================
+Epoch [105/170] |	Loss: 2.276 	Average Acc: 99.064 
+learning rate: [0.03107944749788453]
+================ Train on the train set ================
+Epoch [106/170] |	Loss: 2.273 	Average Acc: 99.064 
+learning rate: [0.030227439656472916]
+================ Train on the train set ================
+Epoch [107/170] |	Loss: 2.274 	Average Acc: 99.189 
+learning rate: [0.02938218412630487]
+================ Train on the train set ================
+Epoch [108/170] |	Loss: 2.268 	Average Acc: 99.220 
+learning rate: [0.028543969561369613]
+================ Train on the train set ================
+Epoch [109/170] |	Loss: 2.274 	Average Acc: 99.189 
+================ Test on the test set ================
+ * Average Acc: 57.692 Best acc 58.583
+ Per-Task Acc:[37.92, 42.14, 68.35, 82.36]
+learning rate: [0.027713082211173128]
+================ Train on the train set ================
+Epoch [110/170] |	Loss: 2.267 	Average Acc: 99.360 
+learning rate: [0.02688980582298438]
+================ Train on the train set ================
+Epoch [111/170] |	Loss: 2.267 	Average Acc: 99.048 
+learning rate: [0.02607442154493571]
+================ Train on the train set ================
+Epoch [112/170] |	Loss: 2.271 	Average Acc: 99.516 
+learning rate: [0.0252672078300111]
+================ Train on the train set ================
+Epoch [113/170] |	Loss: 2.264 	Average Acc: 99.282 
+learning rate: [0.024468440340954693]
+================ Train on the train set ================
+Epoch [114/170] |	Loss: 2.261 	Average Acc: 99.142 
+learning rate: [0.02367839185613223]
+================ Train on the train set ================
+Epoch [115/170] |	Loss: 2.265 	Average Acc: 99.236 
+learning rate: [0.022897332176377554]
+================ Train on the train set ================
+Epoch [116/170] |	Loss: 2.268 	Average Acc: 99.298 
+learning rate: [0.02212552803285575]
+================ Train on the train set ================
+Epoch [117/170] |	Loss: 2.263 	Average Acc: 99.314 
+learning rate: [0.02136324299597477]
+================ Train on the train set ================
+Epoch [118/170] |	Loss: 2.265 	Average Acc: 99.376 
+learning rate: [0.020610737385376377]
+================ Train on the train set ================
+Epoch [119/170] |	Loss: 2.269 	Average Acc: 99.220 
+================ Test on the test set ================
+ * Average Acc: 58.375 Best acc 58.583
+ Per-Task Acc:[37.94, 42.94, 69.66, 82.96]
+learning rate: [0.01986826818103721]
+================ Train on the train set ================
+Epoch [120/170] |	Loss: 2.263 	Average Acc: 99.236 
+learning rate: [0.019136088935510383]
+================ Train on the train set ================
+Epoch [121/170] |	Loss: 2.261 	Average Acc: 99.173 
+learning rate: [0.01841444968733749]
+================ Train on the train set ================
+Epoch [122/170] |	Loss: 2.263 	Average Acc: 99.235 
+learning rate: [0.017703596875660668]
+================ Train on the train set ================
+Epoch [123/170] |	Loss: 2.258 	Average Acc: 99.298 
+learning rate: [0.017003773256063906]
+================ Train on the train set ================
+Epoch [124/170] |	Loss: 2.264 	Average Acc: 99.158 
+learning rate: [0.01631521781767218]
+================ Train on the train set ================
+Epoch [125/170] |	Loss: 2.254 	Average Acc: 99.236 
+learning rate: [0.01563816570153689]
+================ Train on the train set ================
+Epoch [126/170] |	Loss: 2.263 	Average Acc: 99.235 
+learning rate: [0.014972848120335475]
+================ Train on the train set ================
+Epoch [127/170] |	Loss: 2.258 	Average Acc: 99.329 
+learning rate: [0.014319492279412408]
+================ Train on the train set ================
+Epoch [128/170] |	Loss: 2.257 	Average Acc: 99.282 
+learning rate: [0.01367832129918882]
+================ Train on the train set ================
+Epoch [129/170] |	Loss: 2.257 	Average Acc: 99.438 
+================ Test on the test set ================
+ * Average Acc: 58.543 Best acc 58.583
+ Per-Task Acc:[38.4, 42.34, 69.66, 83.77]
+learning rate: [0.01304955413896707]
+================ Train on the train set ================
+Epoch [130/170] |	Loss: 2.263 	Average Acc: 99.438 
+learning rate: [0.012433405522156351]
+================ Train on the train set ================
+Epoch [131/170] |	Loss: 2.258 	Average Acc: 99.376 
+learning rate: [0.011830085862944869]
+================ Train on the train set ================
+Epoch [132/170] |	Loss: 2.260 	Average Acc: 99.407 
+learning rate: [0.011239801194443523]
+================ Train on the train set ================
+Epoch [133/170] |	Loss: 2.257 	Average Acc: 99.360 
+learning rate: [0.010662753098325855]
+================ Train on the train set ================
+Epoch [134/170] |	Loss: 2.263 	Average Acc: 99.158 
+learning rate: [0.01009913863598804]
+================ Train on the train set ================
+Epoch [135/170] |	Loss: 2.261 	Average Acc: 99.189 
+learning rate: [0.009549150281252647]
+================ Train on the train set ================
+Epoch [136/170] |	Loss: 2.265 	Average Acc: 99.267 
+learning rate: [0.009012975854638963]
+================ Train on the train set ================
+Epoch [137/170] |	Loss: 2.261 	Average Acc: 99.267 
+learning rate: [0.008490798459222489]
+================ Train on the train set ================
+Epoch [138/170] |	Loss: 2.267 	Average Acc: 99.267 
+learning rate: [0.007982796418105382]
+================ Train on the train set ================
+Epoch [139/170] |	Loss: 2.261 	Average Acc: 99.360 
+================ Test on the test set ================
+ * Average Acc: 58.562 Best acc 58.583
+ Per-Task Acc:[38.28, 42.64, 70.67, 82.66]
+learning rate: [0.007489143213519312]
+================ Train on the train set ================
+Epoch [140/170] |	Loss: 2.264 	Average Acc: 99.392 
+learning rate: [0.0070100074275813995]
+================ Train on the train set ================
+Epoch [141/170] |	Loss: 2.261 	Average Acc: 99.111 
+learning rate: [0.0065455526847235925]
+================ Train on the train set ================
+Epoch [142/170] |	Loss: 2.257 	Average Acc: 99.360 
+learning rate: [0.0060959375958151134]
+================ Train on the train set ================
+Epoch [143/170] |	Loss: 2.264 	Average Acc: 99.407 
+learning rate: [0.005661315703996914]
+================ Train on the train set ================
+Epoch [144/170] |	Loss: 2.267 	Average Acc: 99.438 
+learning rate: [0.0052418354322468965]
+================ Train on the train set ================
+Epoch [145/170] |	Loss: 2.259 	Average Acc: 99.329 
+learning rate: [0.0048376400326935656]
+================ Train on the train set ================
+Epoch [146/170] |	Loss: 2.262 	Average Acc: 99.407 
+learning rate: [0.0044488675376955856]
+================ Train on the train set ================
+Epoch [147/170] |	Loss: 2.263 	Average Acc: 99.204 
+learning rate: [0.004075650712703856]
+================ Train on the train set ================
+Epoch [148/170] |	Loss: 2.269 	Average Acc: 99.392 
+learning rate: [0.0037181170109221906]
+================ Train on the train set ================
+Epoch [149/170] |	Loss: 2.265 	Average Acc: 99.360 
+================ Test on the test set ================
+ * Average Acc: 58.608 Best acc 58.608
+ Per-Task Acc:[38.06, 43.15, 70.16, 83.06]
+learning rate: [0.003376388529782215]
+================ Train on the train set ================
+Epoch [150/170] |	Loss: 2.260 	Average Acc: 99.423 
+learning rate: [0.0030505819692471787]
+================ Train on the train set ================
+Epoch [151/170] |	Loss: 2.262 	Average Acc: 99.438 
+learning rate: [0.0027408085919590312]
+================ Train on the train set ================
+Epoch [152/170] |	Loss: 2.260 	Average Acc: 99.423 
+learning rate: [0.002447174185242328]
+================ Train on the train set ================
+Epoch [153/170] |	Loss: 2.259 	Average Acc: 99.360 
+learning rate: [0.0021697790249779673]
+================ Train on the train set ================
+Epoch [154/170] |	Loss: 2.267 	Average Acc: 99.298 
+learning rate: [0.0019087178413590509]
+================ Train on the train set ================
+Epoch [155/170] |	Loss: 2.263 	Average Acc: 99.329 
+learning rate: [0.0016640797865406314]
+================ Train on the train set ================
+Epoch [156/170] |	Loss: 2.260 	Average Acc: 99.407 
+learning rate: [0.0014359484041943117]
+================ Train on the train set ================
+Epoch [157/170] |	Loss: 2.265 	Average Acc: 99.376 
+learning rate: [0.0012244016009781721]
+================ Train on the train set ================
+Epoch [158/170] |	Loss: 2.257 	Average Acc: 99.345 
+learning rate: [0.0010295116199317074]
+================ Train on the train set ================
+Epoch [159/170] |	Loss: 2.265 	Average Acc: 99.267 
+================ Test on the test set ================
+ * Average Acc: 58.985 Best acc 58.985
+ Per-Task Acc:[38.36, 44.15, 70.26, 83.17]
+learning rate: [0.0008513450158049123]
+================ Train on the train set ================
+Epoch [160/170] |	Loss: 2.261 	Average Acc: 99.236 
+learning rate: [0.0006899626323298725]
+================ Train on the train set ================
+Epoch [161/170] |	Loss: 2.260 	Average Acc: 99.392 
+learning rate: [0.000545419581442703]
+================ Train on the train set ================
+Epoch [162/170] |	Loss: 2.268 	Average Acc: 99.423 
+learning rate: [0.0004177652244628634]
+================ Train on the train set ================
+Epoch [163/170] |	Loss: 2.259 	Average Acc: 99.298 
+learning rate: [0.00030704315523632006]
+================ Train on the train set ================
+Epoch [164/170] |	Loss: 2.259 	Average Acc: 99.407 
+learning rate: [0.00021329118524827698]
+================ Train on the train set ================
+Epoch [165/170] |	Loss: 2.257 	Average Acc: 99.360 
+learning rate: [0.00013654133071059918]
+================ Train on the train set ================
+Epoch [166/170] |	Loss: 2.261 	Average Acc: 99.454 
+learning rate: [7.681980162830296e-05]
+================ Train on the train set ================
+Epoch [167/170] |	Loss: 2.266 	Average Acc: 99.329 
+learning rate: [3.414699284885476e-05]
+================ Train on the train set ================
+Epoch [168/170] |	Loss: 2.260 	Average Acc: 99.470 
+learning rate: [8.537477097364536e-06]
+================ Train on the train set ================
+Epoch [169/170] |	Loss: 2.254 	Average Acc: 99.470 
+================ Test on the test set ================
+ * Average Acc: 58.860 Best acc 58.985
+ Per-Task Acc:[38.56, 43.45, 69.86, 83.57]
+do not weight align teacher!
+per cls weights : [1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178 1.07293178
+ 1.07293178 1.07293178 1.07293178 1.07293178 0.48947755 0.48947755
+ 0.48947755 0.48947755 0.48947755 0.48947755 0.48947755 0.48947755
+ 0.48947755 0.48947755]
+SNet: Task 3, Epoch 1/130 => Loss 2.146,  Train_accy 66.16, Test_accy 46.95
+SNet: Task 3, Epoch 2/130 => Loss 1.905,  Train_accy 79.78
+SNet: Task 3, Epoch 3/130 => Loss 1.865,  Train_accy 82.44
+SNet: Task 3, Epoch 4/130 => Loss 1.847,  Train_accy 84.22
+SNet: Task 3, Epoch 5/130 => Loss 1.821,  Train_accy 85.67
+SNet: Task 3, Epoch 6/130 => Loss 1.812,  Train_accy 86.67, Test_accy 46.89
+SNet: Task 3, Epoch 7/130 => Loss 1.795,  Train_accy 87.61
+SNet: Task 3, Epoch 8/130 => Loss 1.801,  Train_accy 87.95
+SNet: Task 3, Epoch 9/130 => Loss 1.784,  Train_accy 88.95
+SNet: Task 3, Epoch 10/130 => Loss 1.784,  Train_accy 88.94
+SNet: Task 3, Epoch 11/130 => Loss 1.771,  Train_accy 89.95, Test_accy 49.22
+SNet: Task 3, Epoch 12/130 => Loss 1.766,  Train_accy 90.66
+SNet: Task 3, Epoch 13/130 => Loss 1.756,  Train_accy 91.30
+SNet: Task 3, Epoch 14/130 => Loss 1.766,  Train_accy 91.14
+SNet: Task 3, Epoch 15/130 => Loss 1.755,  Train_accy 91.86
+SNet: Task 3, Epoch 16/130 => Loss 1.746,  Train_accy 92.03, Test_accy 46.61
+SNet: Task 3, Epoch 17/130 => Loss 1.747,  Train_accy 92.44
+SNet: Task 3, Epoch 18/130 => Loss 1.749,  Train_accy 92.53
+SNet: Task 3, Epoch 19/130 => Loss 1.742,  Train_accy 92.34
+SNet: Task 3, Epoch 20/130 => Loss 1.741,  Train_accy 92.70
+SNet: Task 3, Epoch 21/130 => Loss 1.740,  Train_accy 92.73, Test_accy 47.24
+SNet: Task 3, Epoch 22/130 => Loss 1.730,  Train_accy 93.67
+SNet: Task 3, Epoch 23/130 => Loss 1.723,  Train_accy 93.61
+SNet: Task 3, Epoch 24/130 => Loss 1.723,  Train_accy 93.91
+SNet: Task 3, Epoch 25/130 => Loss 1.726,  Train_accy 93.47
+SNet: Task 3, Epoch 26/130 => Loss 1.726,  Train_accy 93.31, Test_accy 47.25
+SNet: Task 3, Epoch 27/130 => Loss 1.724,  Train_accy 93.55
+SNet: Task 3, Epoch 28/130 => Loss 1.722,  Train_accy 93.84
+SNet: Task 3, Epoch 29/130 => Loss 1.716,  Train_accy 94.30
+SNet: Task 3, Epoch 30/130 => Loss 1.718,  Train_accy 94.14
+SNet: Task 3, Epoch 31/130 => Loss 1.712,  Train_accy 94.36, Test_accy 49.27
+SNet: Task 3, Epoch 32/130 => Loss 1.722,  Train_accy 94.52
+SNet: Task 3, Epoch 33/130 => Loss 1.720,  Train_accy 93.91
+SNet: Task 3, Epoch 34/130 => Loss 1.707,  Train_accy 94.77
+SNet: Task 3, Epoch 35/130 => Loss 1.710,  Train_accy 94.88
+SNet: Task 3, Epoch 36/130 => Loss 1.716,  Train_accy 94.84, Test_accy 48.58
+SNet: Task 3, Epoch 37/130 => Loss 1.705,  Train_accy 95.14
+SNet: Task 3, Epoch 38/130 => Loss 1.710,  Train_accy 94.80
+SNet: Task 3, Epoch 39/130 => Loss 1.707,  Train_accy 94.95
+SNet: Task 3, Epoch 40/130 => Loss 1.708,  Train_accy 95.11
+SNet: Task 3, Epoch 41/130 => Loss 1.712,  Train_accy 95.22, Test_accy 47.54
+SNet: Task 3, Epoch 42/130 => Loss 1.703,  Train_accy 95.33
+SNet: Task 3, Epoch 43/130 => Loss 1.703,  Train_accy 94.94
+SNet: Task 3, Epoch 44/130 => Loss 1.701,  Train_accy 95.42
+SNet: Task 3, Epoch 45/130 => Loss 1.700,  Train_accy 95.28
+SNet: Task 3, Epoch 46/130 => Loss 1.702,  Train_accy 95.41, Test_accy 48.37
+SNet: Task 3, Epoch 47/130 => Loss 1.694,  Train_accy 95.42
+SNet: Task 3, Epoch 48/130 => Loss 1.700,  Train_accy 95.30
+SNet: Task 3, Epoch 49/130 => Loss 1.696,  Train_accy 95.38
+SNet: Task 3, Epoch 50/130 => Loss 1.699,  Train_accy 95.41
+SNet: Task 3, Epoch 51/130 => Loss 1.698,  Train_accy 95.28, Test_accy 48.37
+SNet: Task 3, Epoch 52/130 => Loss 1.696,  Train_accy 95.70
+SNet: Task 3, Epoch 53/130 => Loss 1.699,  Train_accy 95.66
+SNet: Task 3, Epoch 54/130 => Loss 1.698,  Train_accy 95.66
+SNet: Task 3, Epoch 55/130 => Loss 1.693,  Train_accy 95.59
+SNet: Task 3, Epoch 56/130 => Loss 1.691,  Train_accy 95.73, Test_accy 49.15
+SNet: Task 3, Epoch 57/130 => Loss 1.698,  Train_accy 95.59
+SNet: Task 3, Epoch 58/130 => Loss 1.689,  Train_accy 95.73
+SNet: Task 3, Epoch 59/130 => Loss 1.693,  Train_accy 95.75
+SNet: Task 3, Epoch 60/130 => Loss 1.688,  Train_accy 95.61
+SNet: Task 3, Epoch 61/130 => Loss 1.694,  Train_accy 95.75, Test_accy 47.99
+SNet: Task 3, Epoch 62/130 => Loss 1.692,  Train_accy 95.52
+SNet: Task 3, Epoch 63/130 => Loss 1.694,  Train_accy 95.58
+SNet: Task 3, Epoch 64/130 => Loss 1.693,  Train_accy 95.94
+SNet: Task 3, Epoch 65/130 => Loss 1.691,  Train_accy 96.14
+SNet: Task 3, Epoch 66/130 => Loss 1.694,  Train_accy 95.91, Test_accy 49.49
+SNet: Task 3, Epoch 67/130 => Loss 1.691,  Train_accy 96.03
+SNet: Task 3, Epoch 68/130 => Loss 1.688,  Train_accy 95.81
+SNet: Task 3, Epoch 69/130 => Loss 1.689,  Train_accy 95.91
+SNet: Task 3, Epoch 70/130 => Loss 1.687,  Train_accy 95.75
+SNet: Task 3, Epoch 71/130 => Loss 1.691,  Train_accy 96.12, Test_accy 49.23
+SNet: Task 3, Epoch 72/130 => Loss 1.686,  Train_accy 95.95
+SNet: Task 3, Epoch 73/130 => Loss 1.692,  Train_accy 96.05
+SNet: Task 3, Epoch 74/130 => Loss 1.691,  Train_accy 96.22
+SNet: Task 3, Epoch 75/130 => Loss 1.690,  Train_accy 95.81
+SNet: Task 3, Epoch 76/130 => Loss 1.685,  Train_accy 96.20, Test_accy 48.26
+SNet: Task 3, Epoch 77/130 => Loss 1.686,  Train_accy 95.89
+SNet: Task 3, Epoch 78/130 => Loss 1.684,  Train_accy 95.92
+SNet: Task 3, Epoch 79/130 => Loss 1.688,  Train_accy 96.22
+SNet: Task 3, Epoch 80/130 => Loss 1.684,  Train_accy 96.23
+SNet: Task 3, Epoch 81/130 => Loss 1.689,  Train_accy 96.14, Test_accy 48.98
+SNet: Task 3, Epoch 82/130 => Loss 1.676,  Train_accy 96.08
+SNet: Task 3, Epoch 83/130 => Loss 1.690,  Train_accy 95.98
+SNet: Task 3, Epoch 84/130 => Loss 1.690,  Train_accy 96.06
+SNet: Task 3, Epoch 85/130 => Loss 1.683,  Train_accy 96.09
+SNet: Task 3, Epoch 86/130 => Loss 1.685,  Train_accy 96.17, Test_accy 48.95
+SNet: Task 3, Epoch 87/130 => Loss 1.677,  Train_accy 95.75
+SNet: Task 3, Epoch 88/130 => Loss 1.687,  Train_accy 96.20
+SNet: Task 3, Epoch 89/130 => Loss 1.684,  Train_accy 96.12
+SNet: Task 3, Epoch 90/130 => Loss 1.677,  Train_accy 96.28
+SNet: Task 3, Epoch 91/130 => Loss 1.683,  Train_accy 96.14, Test_accy 49.52
+SNet: Task 3, Epoch 92/130 => Loss 1.684,  Train_accy 96.28
+SNet: Task 3, Epoch 93/130 => Loss 1.681,  Train_accy 96.06
+SNet: Task 3, Epoch 94/130 => Loss 1.676,  Train_accy 96.09
+SNet: Task 3, Epoch 95/130 => Loss 1.675,  Train_accy 96.20
+SNet: Task 3, Epoch 96/130 => Loss 1.684,  Train_accy 96.27, Test_accy 48.92
+SNet: Task 3, Epoch 97/130 => Loss 1.675,  Train_accy 96.20
+SNet: Task 3, Epoch 98/130 => Loss 1.674,  Train_accy 96.28
+SNet: Task 3, Epoch 99/130 => Loss 1.684,  Train_accy 96.22
+SNet: Task 3, Epoch 100/130 => Loss 1.682,  Train_accy 96.44
+SNet: Task 3, Epoch 101/130 => Loss 1.684,  Train_accy 96.30, Test_accy 49.95
+SNet: Task 3, Epoch 102/130 => Loss 1.687,  Train_accy 96.05
+SNet: Task 3, Epoch 103/130 => Loss 1.676,  Train_accy 96.16
+SNet: Task 3, Epoch 104/130 => Loss 1.681,  Train_accy 96.19
+SNet: Task 3, Epoch 105/130 => Loss 1.677,  Train_accy 96.34
+SNet: Task 3, Epoch 106/130 => Loss 1.680,  Train_accy 96.45, Test_accy 49.25
+SNet: Task 3, Epoch 107/130 => Loss 1.678,  Train_accy 96.16
+SNet: Task 3, Epoch 108/130 => Loss 1.679,  Train_accy 96.34
+SNet: Task 3, Epoch 109/130 => Loss 1.679,  Train_accy 96.23
+SNet: Task 3, Epoch 110/130 => Loss 1.678,  Train_accy 96.45
+SNet: Task 3, Epoch 111/130 => Loss 1.678,  Train_accy 96.06, Test_accy 49.61
+SNet: Task 3, Epoch 112/130 => Loss 1.684,  Train_accy 96.28
+SNet: Task 3, Epoch 113/130 => Loss 1.682,  Train_accy 96.09
+SNet: Task 3, Epoch 114/130 => Loss 1.684,  Train_accy 96.33
+SNet: Task 3, Epoch 115/130 => Loss 1.679,  Train_accy 96.19
+SNet: Task 3, Epoch 116/130 => Loss 1.671,  Train_accy 96.20, Test_accy 49.26
+SNet: Task 3, Epoch 117/130 => Loss 1.679,  Train_accy 96.12
+SNet: Task 3, Epoch 118/130 => Loss 1.676,  Train_accy 96.22
+SNet: Task 3, Epoch 119/130 => Loss 1.681,  Train_accy 96.53
+SNet: Task 3, Epoch 120/130 => Loss 1.679,  Train_accy 96.16
+SNet: Task 3, Epoch 121/130 => Loss 1.668,  Train_accy 96.38, Test_accy 49.62
+SNet: Task 3, Epoch 122/130 => Loss 1.678,  Train_accy 96.25
+SNet: Task 3, Epoch 123/130 => Loss 1.682,  Train_accy 96.27
+SNet: Task 3, Epoch 124/130 => Loss 1.676,  Train_accy 96.53
+SNet: Task 3, Epoch 125/130 => Loss 1.682,  Train_accy 96.48
+SNet: Task 3, Epoch 126/130 => Loss 1.687,  Train_accy 96.66, Test_accy 49.08
+SNet: Task 3, Epoch 127/130 => Loss 1.679,  Train_accy 96.25
+SNet: Task 3, Epoch 128/130 => Loss 1.678,  Train_accy 96.23
+SNet: Task 3, Epoch 129/130 => Loss 1.674,  Train_accy 96.75
+SNet: Task 3, Epoch 130/130 => Loss 1.684,  Train_accy 96.41
+do not weight align student!
+darknet eval: 
+CNN top1 curve: 49.523092369477915
+Construct examplars for class 0
+Construct examplars for class 1
+Construct examplars for class 2
+Construct examplars for class 3
+Construct examplars for class 4
+Construct examplars for class 5
+Construct examplars for class 6
+Construct examplars for class 7
+Construct examplars for class 8
+Construct examplars for class 9
+Construct examplars for class 10
+Construct examplars for class 11
+Construct examplars for class 12
+Construct examplars for class 13
+Construct examplars for class 14
+Construct examplars for class 15
+Construct examplars for class 16
+Construct examplars for class 17
+Construct examplars for class 18
+Construct examplars for class 19
+Construct examplars for class 20
+Construct examplars for class 21
+Construct examplars for class 22
+Construct examplars for class 23
+Construct examplars for class 24
+Construct examplars for class 25
+Construct examplars for class 26
+Construct examplars for class 27
+Construct examplars for class 28
+Construct examplars for class 29
+Construct examplars for class 30
+Construct examplars for class 31
+Construct examplars for class 32
+Construct examplars for class 33
+Construct examplars for class 34
+Construct examplars for class 35
+Construct examplars for class 36
+Construct examplars for class 37
+Construct examplars for class 38
+Construct examplars for class 39
+Construct examplars for class 40
+Construct examplars for class 41
+Construct examplars for class 42
+Construct examplars for class 43
+Construct examplars for class 44
+Construct examplars for class 45
+Construct examplars for class 46
+Construct examplars for class 47
+Construct examplars for class 48
+Construct examplars for class 49
+Construct examplars for class 50
+Construct examplars for class 51
+Construct examplars for class 52
+Construct examplars for class 53
+Construct examplars for class 54
+Construct examplars for class 55
+Construct examplars for class 56
+Construct examplars for class 57
+Construct examplars for class 58
+Construct examplars for class 59
+Construct examplars for class 60
+Construct examplars for class 61
+Construct examplars for class 62
+Construct examplars for class 63
+Construct examplars for class 64
+Construct examplars for class 65
+Construct examplars for class 66
+Construct examplars for class 67
+Construct examplars for class 68
+Construct examplars for class 69
+Construct examplars for class 70
+Construct examplars for class 71
+Construct examplars for class 72
+Construct examplars for class 73
+Construct examplars for class 74
+Construct examplars for class 75
+Construct examplars for class 76
+Construct examplars for class 77
+Construct examplars for class 78
+Construct examplars for class 79
+================Task 4 Start!================
+Trainable params in the model: 479674
+Learning on 80-90
+per cls weights : [1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767 1.03330767
+ 1.03330767 1.03330767 0.73353866 0.73353866 0.73353866 0.73353866
+ 0.73353866 0.73353866 0.73353866 0.73353866 0.73353866 0.73353866]
+SGD (
+Parameter Group 0
+    dampening: 0
+    initial_lr: 0.1
+    lr: 0.1
+    maximize: False
+    momentum: 0.9
+    nesterov: False
+    weight_decay: 0.0005
+)
+================Task 4 Training!================
+The training samples number: 6600
+learning rate: [0.1]
+================ Train on the train set ================
+Epoch [0/170] |	Loss: 6.238 	Average Acc: 61.749 
+learning rate: [0.09999146252290264]
+================ Train on the train set ================
+Epoch [1/170] |	Loss: 4.224 	Average Acc: 77.481 
+learning rate: [0.09996585300715116]
+================ Train on the train set ================
+Epoch [2/170] |	Loss: 3.628 	Average Acc: 81.357 
+learning rate: [0.09992318019837171]
+================ Train on the train set ================
+Epoch [3/170] |	Loss: 3.317 	Average Acc: 83.625 
+learning rate: [0.09986345866928942]
+================ Train on the train set ================
+Epoch [4/170] |	Loss: 3.166 	Average Acc: 84.819 
+learning rate: [0.09978670881475173]
+================ Train on the train set ================
+Epoch [5/170] |	Loss: 3.087 	Average Acc: 87.010 
+learning rate: [0.0996929568447637]
+================ Train on the train set ================
+Epoch [6/170] |	Loss: 3.055 	Average Acc: 87.147 
+learning rate: [0.09958223477553715]
+================ Train on the train set ================
+Epoch [7/170] |	Loss: 3.010 	Average Acc: 87.944 
+learning rate: [0.09945458041855731]
+================ Train on the train set ================
+Epoch [8/170] |	Loss: 2.962 	Average Acc: 88.740 
+learning rate: [0.09931003736767013]
+================ Train on the train set ================
+Epoch [9/170] |	Loss: 2.907 	Average Acc: 90.288 
+================ Test on the test set ================
+ * Average Acc: 52.364 Best acc 52.364
+ Per-Task Acc:[30.87, 34.58, 55.95, 70.26, 70.16]
+learning rate: [0.0991486549841951]
+================ Train on the train set ================
+Epoch [10/170] |	Loss: 2.883 	Average Acc: 90.564 
+learning rate: [0.0989704883800683]
+================ Train on the train set ================
+Epoch [11/170] |	Loss: 2.956 	Average Acc: 89.614 
+learning rate: [0.09877559839902185]
+================ Train on the train set ================
+Epoch [12/170] |	Loss: 2.894 	Average Acc: 91.437 
+learning rate: [0.09856405159580571]
+================ Train on the train set ================
+Epoch [13/170] |	Loss: 2.812 	Average Acc: 92.708 
+learning rate: [0.0983359202134594]
+================ Train on the train set ================
+Epoch [14/170] |	Loss: 2.822 	Average Acc: 92.188 
+learning rate: [0.09809128215864098]
+================ Train on the train set ================
+Epoch [15/170] |	Loss: 2.839 	Average Acc: 92.095 
+learning rate: [0.09783022097502206]
+================ Train on the train set ================
+Epoch [16/170] |	Loss: 2.810 	Average Acc: 92.494 
+learning rate: [0.0975528258147577]
+================ Train on the train set ================
+Epoch [17/170] |	Loss: 2.825 	Average Acc: 91.712 
+learning rate: [0.097259191408041]
+================ Train on the train set ================
+Epoch [18/170] |	Loss: 2.811 	Average Acc: 92.615 
+learning rate: [0.09694941803075285]
+================ Train on the train set ================
+Epoch [19/170] |	Loss: 2.826 	Average Acc: 92.601 
+================ Test on the test set ================
+ * Average Acc: 51.232 Best acc 52.364
+ Per-Task Acc:[30.05, 37.4, 53.12, 75.81, 59.78]
+learning rate: [0.09662361147021781]
+================ Train on the train set ================
+Epoch [20/170] |	Loss: 2.881 	Average Acc: 91.069 
+learning rate: [0.09628188298907785]
+================ Train on the train set ================
+Epoch [21/170] |	Loss: 2.821 	Average Acc: 92.646 
+learning rate: [0.09592434928729618]
+================ Train on the train set ================
+Epoch [22/170] |	Loss: 2.797 	Average Acc: 93.077 
+learning rate: [0.09555113246230446]
+================ Train on the train set ================
+Epoch [23/170] |	Loss: 2.810 	Average Acc: 92.937 
+learning rate: [0.09516235996730647]
+================ Train on the train set ================
+Epoch [24/170] |	Loss: 2.745 	Average Acc: 93.873 
+learning rate: [0.09475816456775316]
+================ Train on the train set ================
+Epoch [25/170] |	Loss: 2.769 	Average Acc: 93.367 
+learning rate: [0.09433868429600312]
+================ Train on the train set ================
+Epoch [26/170] |	Loss: 2.766 	Average Acc: 93.643 
+learning rate: [0.09390406240418492]
+================ Train on the train set ================
+Epoch [27/170] |	Loss: 2.827 	Average Acc: 93.137 
+learning rate: [0.09345444731527644]
+================ Train on the train set ================
+Epoch [28/170] |	Loss: 2.847 	Average Acc: 92.279 
+learning rate: [0.09298999257241865]
+================ Train on the train set ================
+Epoch [29/170] |	Loss: 2.787 	Average Acc: 93.566 
+================ Test on the test set ================
+ * Average Acc: 51.946 Best acc 52.364
+ Per-Task Acc:[27.88, 34.27, 49.8, 71.17, 76.61]
+learning rate: [0.09251085678648074]
+================ Train on the train set ================
+Epoch [30/170] |	Loss: 2.783 	Average Acc: 93.260 
+learning rate: [0.09201720358189468]
+================ Train on the train set ================
+Epoch [31/170] |	Loss: 2.757 	Average Acc: 94.164 
+learning rate: [0.09150920154077757]
+================ Train on the train set ================
+Epoch [32/170] |	Loss: 2.733 	Average Acc: 94.394 
+learning rate: [0.09098702414536111]
+================ Train on the train set ================
+Epoch [33/170] |	Loss: 2.754 	Average Acc: 93.964 
+learning rate: [0.09045084971874742]
+================ Train on the train set ================
+Epoch [34/170] |	Loss: 2.758 	Average Acc: 93.658 
+learning rate: [0.08990086136401203]
+================ Train on the train set ================
+Epoch [35/170] |	Loss: 2.732 	Average Acc: 94.439 
+learning rate: [0.0893372469016742]
+================ Train on the train set ================
+Epoch [36/170] |	Loss: 2.715 	Average Acc: 94.807 
+learning rate: [0.08876019880555654]
+================ Train on the train set ================
+Epoch [37/170] |	Loss: 2.825 	Average Acc: 93.413 
+learning rate: [0.0881699141370552]
+================ Train on the train set ================
+Epoch [38/170] |	Loss: 2.832 	Average Acc: 92.801 
+learning rate: [0.08756659447784372]
+================ Train on the train set ================
+Epoch [39/170] |	Loss: 2.798 	Average Acc: 93.535 
+================ Test on the test set ================
+ * Average Acc: 53.396 Best acc 53.396
+ Per-Task Acc:[28.87, 36.19, 52.42, 75.1, 74.4]
+learning rate: [0.08695044586103301]
+================ Train on the train set ================
+Epoch [40/170] |	Loss: 2.800 	Average Acc: 93.291 
+learning rate: [0.08632167870081127]
+================ Train on the train set ================
+Epoch [41/170] |	Loss: 2.726 	Average Acc: 94.685 
+learning rate: [0.08568050772058768]
+================ Train on the train set ================
+Epoch [42/170] |	Loss: 2.716 	Average Acc: 94.792 
+learning rate: [0.0850271518796646]
+================ Train on the train set ================
+Epoch [43/170] |	Loss: 2.742 	Average Acc: 94.363 
+learning rate: [0.0843618342984632]
+================ Train on the train set ================
+Epoch [44/170] |	Loss: 2.703 	Average Acc: 94.914 
+learning rate: [0.08368478218232793]
+================ Train on the train set ================
+Epoch [45/170] |	Loss: 2.705 	Average Acc: 95.297 
+learning rate: [0.08299622674393621]
+================ Train on the train set ================
+Epoch [46/170] |	Loss: 2.721 	Average Acc: 94.440 
+learning rate: [0.08229640312433945]
+================ Train on the train set ================
+Epoch [47/170] |	Loss: 2.788 	Average Acc: 93.688 
+learning rate: [0.08158555031266262]
+================ Train on the train set ================
+Epoch [48/170] |	Loss: 2.852 	Average Acc: 92.233 
+learning rate: [0.08086391106448973]
+================ Train on the train set ================
+Epoch [49/170] |	Loss: 2.760 	Average Acc: 94.117 
+================ Test on the test set ================
+ * Average Acc: 48.556 Best acc 53.396
+ Per-Task Acc:[24.84, 32.66, 43.65, 67.44, 74.19]
+learning rate: [0.08013173181896291]
+================ Train on the train set ================
+Epoch [50/170] |	Loss: 2.719 	Average Acc: 94.868 
+learning rate: [0.07938926261462374]
+================ Train on the train set ================
+Epoch [51/170] |	Loss: 2.659 	Average Acc: 95.773 
+learning rate: [0.07863675700402534]
+================ Train on the train set ================
+Epoch [52/170] |	Loss: 2.629 	Average Acc: 96.860 
+learning rate: [0.07787447196714435]
+================ Train on the train set ================
+Epoch [53/170] |	Loss: 2.691 	Average Acc: 95.634 
+learning rate: [0.07710266782362254]
+================ Train on the train set ================
+Epoch [54/170] |	Loss: 2.687 	Average Acc: 95.849 
+learning rate: [0.07632160814386786]
+================ Train on the train set ================
+Epoch [55/170] |	Loss: 2.682 	Average Acc: 95.405 
+learning rate: [0.07553155965904541]
+================ Train on the train set ================
+Epoch [56/170] |	Loss: 2.662 	Average Acc: 95.895 
+learning rate: [0.07473279216998902]
+================ Train on the train set ================
+Epoch [57/170] |	Loss: 2.668 	Average Acc: 95.666 
+learning rate: [0.0739255784550644]
+================ Train on the train set ================
+Epoch [58/170] |	Loss: 2.673 	Average Acc: 95.435 
+learning rate: [0.07311019417701574]
+================ Train on the train set ================
+Epoch [59/170] |	Loss: 2.661 	Average Acc: 95.527 
+================ Test on the test set ================
+ * Average Acc: 46.148 Best acc 53.396
+ Per-Task Acc:[21.67, 26.41, 42.74, 59.38, 80.54]
+learning rate: [0.072286917788827]
+================ Train on the train set ================
+Epoch [60/170] |	Loss: 2.691 	Average Acc: 95.573 
+learning rate: [0.07145603043863052]
+================ Train on the train set ================
+Epoch [61/170] |	Loss: 2.697 	Average Acc: 95.267 
+learning rate: [0.07061781587369526]
+================ Train on the train set ================
+Epoch [62/170] |	Loss: 2.694 	Average Acc: 95.374 
+learning rate: [0.0697725603435272]
+================ Train on the train set ================
+Epoch [63/170] |	Loss: 2.664 	Average Acc: 96.155 
+learning rate: [0.0689205525021156]
+================ Train on the train set ================
+Epoch [64/170] |	Loss: 2.662 	Average Acc: 95.819 
+learning rate: [0.06806208330935773]
+================ Train on the train set ================
+Epoch [65/170] |	Loss: 2.644 	Average Acc: 96.371 
+learning rate: [0.06719744593169648]
+================ Train on the train set ================
+Epoch [66/170] |	Loss: 2.624 	Average Acc: 96.677 
+learning rate: [0.06632693564200423]
+================ Train on the train set ================
+Epoch [67/170] |	Loss: 2.602 	Average Acc: 97.305 
+learning rate: [0.06545084971874744]
+================ Train on the train set ================
+Epoch [68/170] |	Loss: 2.598 	Average Acc: 97.259 
+learning rate: [0.06456948734446631]
+================ Train on the train set ================
+Epoch [69/170] |	Loss: 2.611 	Average Acc: 96.647 
+================ Test on the test set ================
+ * Average Acc: 51.706 Best acc 53.396
+ Per-Task Acc:[27.88, 33.97, 48.39, 68.15, 80.14]
+learning rate: [0.06368314950360422]
+================ Train on the train set ================
+Epoch [70/170] |	Loss: 2.648 	Average Acc: 96.355 
+learning rate: [0.06279213887972185]
+================ Train on the train set ================
+Epoch [71/170] |	Loss: 2.643 	Average Acc: 96.585 
+learning rate: [0.061896759752131]
+================ Train on the train set ================
+Epoch [72/170] |	Loss: 2.596 	Average Acc: 97.382 
+learning rate: [0.0609973178919835]
+================ Train on the train set ================
+Epoch [73/170] |	Loss: 2.600 	Average Acc: 97.198 
+learning rate: [0.06009412045785057]
+================ Train on the train set ================

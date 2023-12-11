@@ -4,9 +4,13 @@ import os
 import numpy as np
 from .dataset import ContinualDatasets
 
-MEAN = [120.39586422 / 255.0, 115.59361427 / 255.0, 104.54012653 / 255.0]
-STD = [70.68188272 / 255.0, 68.27635443 / 255.0, 72.54505529 / 255.0]
-
+# MEAN = [120.39586422 / 255.0, 115.59361427 / 255.0, 104.54012653 / 255.0]
+# STD = [70.68188272 / 255.0, 68.27635443 / 255.0, 72.54505529 / 255.0]
+"""
+cifar100 specially
+"""
+MEAN = (0.5071, 0.4867, 0.4408)
+STD = (0.2675, 0.2565, 0.2761)
 def get_dataloader(config, mode, cls_map=None):
     '''
     Initialize the dataloaders for Continual Learning.
@@ -26,7 +30,7 @@ def get_dataloader(config, mode, cls_map=None):
 
     data_root = config['data_root']
 
-    trfms_list = get_augment_method(config, mode) # todo: (FOSTER) add augment
+    trfms_list = get_augment_method(config, mode)
     trfms_list.append(transforms.ToTensor())
     trfms_list.append(transforms.Normalize(mean=MEAN, std=STD))
     trfms = transforms.Compose(trfms_list)

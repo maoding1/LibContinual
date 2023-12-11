@@ -1,6 +1,6 @@
 import os
 import torch
-from torch import nn
+from torch import nn, optim
 from time import time
 from tqdm import tqdm
 from core.data import get_dataloader, DataManager
@@ -46,12 +46,22 @@ class Trainer(object):
         ) = self._init_dataloader(config)
         
         self.buffer = self._init_buffer(config)
+        """
+            修改原因：
+            模型经过before_task后才拥有parameters
+            在此处optimizer会因参数为空而报错
+            并且在train_loop()中原本便会在before_task后生成optimizer和scheduler,因此此处可能不需要init
+        """
+        # (
+        #     self.init_epoch,
+        #     self.inc_epoch,
+        #     self.optimizer,
+        #     self.scheduler,
+        # ) = self._init_optim(config)
         (
             self.init_epoch,
-            self.inc_epoch,
-            self.optimizer,
-            self.scheduler,
-        ) = self._init_optim(config)
+            self.inc_epoch
+        ) = self._init_train_epoch(config)
 
         self.train_meter, self.test_meter = self._init_meter()
 
@@ -150,13 +160,14 @@ class Trainer(object):
         )  # if config['warmup']==0, scheduler will be a normal lr_scheduler, jump into this class for details
         print(optimizer)
         
+        return  optimizer, scheduler
 
+    def _init_train_epoch(self, config):
         if 'init_epoch' in config.keys():
             init_epoch = config['init_epoch']
         else:
             init_epoch = config['epoch']
-        
-        return init_epoch, config['epoch'], optimizer, scheduler
+        return init_epoch, config['epoch']
 
     def _init_data(self, config):
         return config['init_cls_num'], config['inc_cls_num'], config['task_num']
@@ -173,11 +184,18 @@ class Trainer(object):
             tuple: A tuple of the model and model's type.
         """
         backbone = get_instance(arch, "backbone", config)
-        dic = {"backbone": backbone, "device": self.device}
+        """
+            修改原因：FOSTER model的初始化需要init_cls_num和 inc_cls_num
+        """
+        dic = \
+            {
+                "backbone": backbone, "device": self.device,
+                "init_cls_num": self.init_cls_num, "inc_cls_num": self.inc_cls_num
+            }
 
         model = get_instance(arch, "classifier", config, **dic)
         print(model)
-        print("Trainable params in the model: {}".format(count_parameters(model)))
+        print("Trainable params in the model: {}".format(count_parameters(model,trainable=True)))
 
         model = model.to(self.device)
         return model
@@ -219,19 +237,26 @@ class Trainer(object):
         experiment_begin = time()
         for task_idx in range(self.task_num):
             print("================Task {} Start!================".format(task_idx))
-            if (isinstance(self.model, FOSTER)):
-                self.model.incremental_train(self.data_manager)
-                cnn_accy, nme_accy = self.model.eval_task()
-                self.model.after_task()
-                continue
+            print("Trainable params in the model: {}".format(count_parameters(self.model, trainable=True)))
             if hasattr(self.model, 'before_task'):
                 self.model.before_task(task_idx, self.buffer, self.train_loader.get_loader(task_idx), self.test_loader.get_loader(task_idx))
-            
-            (
-                _, __,
-                self.optimizer,
-                self.scheduler,
-            ) = self._init_optim(self.config)
+
+            if task_idx == 0:
+                self.optimizer = optim.SGD(
+                    filter(lambda p: p.requires_grad, self.model.parameters()),
+                    momentum=0.9,
+                    lr=args["init_lr"],
+                    weight_decay=args["init_weight_decay"],
+                )
+                self.scheduler = optim.lr_scheduler.CosineAnnealingLR(
+                    optimizer=self.optimizer, T_max=args["init_epoch"]
+                )
+                print(self.optimizer)
+            else:
+                (
+                    self.optimizer,
+                    self.scheduler,
+                ) = self._init_optim(self.config)
 
             self.buffer.total_classes += self.init_cls_num if task_idx == 0 else self.inc_cls_num
 
@@ -245,7 +270,9 @@ class Trainer(object):
                     datasets,
                     shuffle = True,
                     batch_size = self.config['batch_size'],
-                    drop_last = True
+                    drop_last = False,
+                    num_workers=4,
+                    pin_memory=True
                 )
             
             print("================Task {} Training!================".format(task_idx))
@@ -279,6 +306,8 @@ class Trainer(object):
                 hearding_update(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device)
             elif self.buffer.strategy == 'random':
                 random_update(self.train_loader.get_loader(task_idx).dataset, self.buffer)
+            elif self.buffer.strategy == 'foster':
+                herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, 20)
 
 
 
@@ -304,11 +333,14 @@ class Trainer(object):
                 self.optimizer.zero_grad()
 
                 loss.backward()
+                if hasattr(self.model, 'after_backward'):
+                    self.model.after_backward()
 
                 self.optimizer.step()
                 pbar.update(1)
                 
                 meter.update("acc1", acc)
+                meter.update("loss", loss.item())
 
 
         return meter

@@ -1,79 +1,67 @@
-import logging
-
 import numpy as np
 import torch
 from torch import nn
 from torch import optim
 from torch.nn import functional as F
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader,ConcatDataset
 from tqdm import tqdm
+from itertools import chain
 
-from core.data import DataManager
-from core.utils.inc_net import FOSTERNet
-from core.utils.utils import count_parameters, tensor2numpy, accuracy, get_instance, GradualWarmupScheduler
-from finetune import Finetune
+from core.model.replay.inc_net import FOSTERNet
+from core.utils.utils import count_parameters, tensor2numpy, accuracy
+from .finetune import Finetune
+from ...data import DataManager
 
 # Please refer to https://github.com/G-U-N/ECCV22-FOSTER for the full source code to reproduce foster.
 
-EPSILON = 1e-8
-batch_size = 64
 
 
 class FOSTER(Finetune):
-    def __init__(self, args):
-        super().__init__(args)
+    def __init__(self, backbone,feat_dim, num_class, **args):
+        super().__init__(backbone,feat_dim, num_class,**args)
         self.args = args
         self._network = FOSTERNet(args, False)
         self._snet = None
         self.beta1 = args["beta1"]
         self.beta2 = args["beta2"]
+        # todo (FOSTER) add methods to update per_cls_weights
         self.per_cls_weights = None
         self.is_teacher_wa = args["is_teacher_wa"]
         self.is_student_wa = args["is_student_wa"]
         self.lambda_okd = args["lambda_okd"]
         self.wa_value = args["wa_value"]
+        self.init_cls_num = args["init_cls_num"]
+        self.inc_cls_num = args["inc_cls_num"]
         self.oofc = args["oofc"].lower()
 
         self._cur_task = -1
         self._known_classes = 0
         self._total_classes = 0
         self._old_network = None
-        self._data_memory, self._targets_memory = np.array([]), np.array([])
-        self.topk = 5
-        self._memory_size = args["memory_size"]
+
+        # self._data_memory, self._targets_memory = np.array([]), np.array([])
+        # self.topk = 5
+        # todo: (FOSTER)replace with buffer and dataloader and fix device things
+        #self._memory_size = args["memory_size"]
         self._memory_per_class = args.get("memory_per_class", None)
         self._fixed_memory = args.get("fixed_memory", False)
-        self._device = args["device"][0]
-        self._multiple_gpus = args["device"]
-        self.data_manager = DataManager(
-            args["dataset"],
-            args["shuffle"],
-            args["seed"],
-            args["init_cls"],
-            args["increment"],
-        )
+        self._device = args["device"]
+        # self.data_manager = DataManager(
+        #     args["data_root"],
+        #     num_class,
+        #     args["shuffle"],
+        #     args["seed"],
+        #     args["init_cls_num"],
+        #     args["inc_cls_num"],
+        # )
+    def before_task(self, task_idx, buffer, train_loader, test_loaders):
+        self.buffer = buffer
+        self.train_loader = train_loader
 
-    def after_task(self):
-        self._known_classes = self._total_classes
-        print("Exemplar size: {}".format(self.exemplar_size))
-
-    @property
-    def exemplar_size(self):
-        assert len(self._data_memory) == len(
-            self._targets_memory
-        ), "Exemplar size error."
-        return len(self._targets_memory)
-
-    def observe(self, data): #todo (FOSTER) finish observe method
-        pass
-    def incremental_train(self, data_manager):  # todo: (FOSTER)fix data_manager
-        self.data_manager = data_manager
         self._cur_task += 1
         if self._cur_task > 1:
             self._network = self._snet
-        self._total_classes = self._known_classes + data_manager.get_task_size(
-            self._cur_task
-        )
+        self._total_classes = self._known_classes + (self.init_cls_num if task_idx == 0 else self.inc_cls_num)
         self._network.update_fc(self._total_classes)
         self._network_module_ptr = self._network
         print(
@@ -85,65 +73,6 @@ class FOSTER(Finetune):
                 p.requires_grad = False
             for p in self._network.oldfc.parameters():
                 p.requires_grad = False
-
-        print("All params: {}".format(count_parameters(self._network)))
-        print(
-            "Trainable params: {}".format(count_parameters(self._network, True))
-        )
-
-        train_dataset = data_manager.get_dataset(
-            np.arange(self._known_classes, self._total_classes),
-            source="train",
-            mode="train",
-            appendent=self._get_memory(),
-        )
-        self.train_loader = DataLoader(
-            train_dataset,
-            batch_size=self.args["batch_size"],
-            shuffle=True,
-            num_workers=self.args["num_workers"],
-            pin_memory=True,
-        )
-        test_dataset = data_manager.get_dataset(
-            np.arange(0, self._total_classes), source="test", mode="test"
-        )
-        self.test_loader = DataLoader(
-            test_dataset,
-            batch_size=self.args["batch_size"],
-            shuffle=False,
-            num_workers=self.args["num_workers"],
-        )
-
-        if len(self._multiple_gpus) > 1:
-            self._network = nn.DataParallel(self._network, self._multiple_gpus)
-        self._train(self.train_loader, self.test_loader)
-        self.build_rehearsal_memory(data_manager, self.samples_per_class)
-        if len(self._multiple_gpus) > 1:
-            self._network = self._network.module
-
-    def train(self):
-        self._network_module_ptr.train()
-        self._network_module_ptr.convnets[-1].train()
-        if self._cur_task >= 1:
-            self._network_module_ptr.convnets[0].eval()
-
-    def _train(self, train_loader, test_loader):
-        self._network.to(self._device)
-        if hasattr(self._network, "module"):
-            self._network_module_ptr = self._network.module
-        if self._cur_task == 0:
-            optimizer = optim.SGD(
-                filter(lambda p: p.requires_grad, self._network.parameters()),
-                momentum=0.9,
-                lr=self.args["init_lr"],
-                weight_decay=self.args["init_weight_decay"],
-            )
-            scheduler = optim.lr_scheduler.CosineAnnealingLR(
-                optimizer=optimizer, T_max=self.args["init_epochs"]
-            )
-            self._init_train(train_loader, test_loader, optimizer, scheduler)
-        else:
-
             cls_num_list = [self.samples_old_class] * self._known_classes + [
                 self.samples_new_class(i)
                 for i in range(self._known_classes, self._total_classes)
@@ -154,26 +83,9 @@ class FOSTER(Finetune):
             per_cls_weights = (
                     per_cls_weights / np.sum(per_cls_weights) * len(cls_num_list)
             )
-
             print("per cls weights : {}".format(per_cls_weights))
             self.per_cls_weights = torch.FloatTensor(per_cls_weights).to(self._device)
-
-            optimizer = optim.SGD(
-                filter(lambda p: p.requires_grad, self._network.parameters()),
-                lr=self.args["lr"],
-                momentum=0.9,
-                weight_decay=self.args["weight_decay"],
-            )
-            scheduler = optim.lr_scheduler.CosineAnnealingLR(
-                optimizer=optimizer, T_max=self.args["boosting_epochs"]
-            )
-            # optimizer = get_instance(
-            #     torch.optim, "optimizer", self.args, params=self.model.parameters()
-            # )
-            # scheduler = GradualWarmupScheduler(
-            #     optimizer, self.config
-            # )
-            if self.oofc == "az": # all zero strategy
+            if self.oofc == "az":
                 for i, p in enumerate(self._network_module_ptr.fc.parameters()):
                     if i == 0:
                         p.data[
@@ -181,7 +93,14 @@ class FOSTER(Finetune):
                         ] = torch.tensor(0.0)
             elif self.oofc != "ft":
                 assert 0, "not implemented"
-            self._feature_boosting(train_loader, test_loader, optimizer, scheduler)
+
+        self._network.to(self._device)
+
+
+
+    def after_task(self, task_idx, buffer, train_loader, test_loaders):
+        if task_idx > 0:
+            # feature compression
             if self.is_teacher_wa:
                 self._network_module_ptr.weight_align(
                     self._known_classes,
@@ -202,190 +121,114 @@ class FOSTER(Finetune):
             )
             print("per cls weights : {}".format(per_cls_weights))
             self.per_cls_weights = torch.FloatTensor(per_cls_weights).to(self._device)
-            self._feature_compression(train_loader, test_loader)
 
-    # def before_task(self, task_idx, buffer, train_loader, test_loaders):
-    #     hasInit = False
-    #     if task_idx == 0:
-    #         optimizer = optim.SGD(
-    #             filter(lambda p: p.requires_grad, self._network.parameters()),
-    #             momentum=0.9,
-    #             lr=self.args["init_lr"],
-    #             weight_decay=self.args["init_weight_decay"],
-    #         )
-    #         scheduler = optim.lr_scheduler.CosineAnnealingLR(
-    #             optimizer=optimizer, T_max=self.args["init_epochs"]
-    #         )
-    #         print("================Begin to train Init Classes!================")
-    #         prog_bar = tqdm(range(self.args["init_epochs"]))
-    #         for _, epoch in enumerate(prog_bar):
-    #             self.train()
-    #             losses = 0.0
-    #             correct, total = 0, 0
-    #             for i, (_, inputs, targets) in enumerate(train_loader):
-    #                 inputs, targets = inputs.to(
-    #                     self._device, non_blocking=True
-    #                 ), targets.to(self._device, non_blocking=True)
-    #                 logits = self._network(inputs)["logits"]
-    #                 loss = F.cross_entropy(logits, targets)
-    #                 optimizer.zero_grad()
-    #                 loss.backward()
-    #                 optimizer.step()
-    #                 losses += loss.item()
-    #                 _, preds = torch.max(logits, dim=1)
-    #                 correct += preds.eq(targets.expand_as(preds)).cpu().sum()
-    #                 total += len(targets)
-    #             scheduler.step()
-    #             train_acc = np.around(tensor2numpy(correct) * 100 / total, decimals=2)
-    #
-    #             if epoch % 5 == 0:
-    #                 test_acc = self._compute_accuracy(self._network, test_loaders[-1])
-    #                 info = "Task {}, Epoch {}/{} => Loss {:.3f}, Train_accy {:.2f}, Test_accy {:.2f}".format(
-    #                     self._cur_task,
-    #                     epoch + 1,
-    #                     self.args["init_epochs"],
-    #                     losses / len(train_loader),
-    #                     train_acc,
-    #                     test_acc,
-    #                 )
-    #             else:
-    #                 info = "Task {}, Epoch {}/{} => Loss {:.3f}, Train_accy {:.2f}".format(
-    #                     self._cur_task,
-    #                     epoch + 1,
-    #                     self.args["init_epochs"],
-    #                     losses / len(train_loader),
-    #                     train_acc,
-    #                 )
-    #
-    #             prog_bar.set_description(info)
-    #             print(info)
-    #             hasInit = True
-    #     return hasInit
+            #todo (FOSTER) fix concat bugs
+            merged_loaders = list(chain.from_iterable(test_loaders))
+            self._feature_compression(train_loader, merged_loaders)
 
-    def _init_train(self, train_loader, test_loader, optimizer, scheduler):
-        prog_bar = tqdm(range(self.args["init_epochs"]))
-        for _, epoch in enumerate(prog_bar):
-            self.train()
-            losses = 0.0
+        self._known_classes = self._total_classes
+        #print("Exemplar size: {}".format(self.exemplar_size))
+        # self.build_rehearsal_memory(data_manager, self.samples_per_class)
+
+    def observe(self, data):
+
+        if self._cur_task > 0:
             correct, total = 0, 0
-            for i, (_, inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.to(
-                    self._device, non_blocking=True
-                ), targets.to(self._device, non_blocking=True)
-                logits = self._network(inputs)["logits"]
-                loss = F.cross_entropy(logits, targets)
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-                losses += loss.item()
-                _, preds = torch.max(logits, dim=1)
-                correct += preds.eq(targets.expand_as(preds)).cpu().sum()
-                total += len(targets)
-            scheduler.step()
+            inputs, targets = data["image"], data["label"]
+            inputs, targets = inputs.to(
+                self._device, non_blocking=True
+            ), targets.to(self._device, non_blocking=True)
+            outputs = self._network(inputs)
+            logits, fe_logits, old_logits = (
+                outputs["logits"],
+                outputs["fe_logits"],
+                outputs["old_logits"].detach(),
+            )
+            loss_clf = F.cross_entropy(logits / self.per_cls_weights, targets)
+            loss_fe = F.cross_entropy(fe_logits, targets)
+            loss_kd = self.lambda_okd * _KD_loss(
+                logits[:, : self._known_classes], old_logits, self.args["T"]
+            )
+            loss = loss_clf + loss_fe + loss_kd
+            # optimizer.zero_grad()
+            # loss.backward()
+            # todo(FOSTER) 没有进行backward
+            # if self.oofc == "az":
+            #     for i, p in enumerate(self._network_module_ptr.fc.parameters()):
+            #         if i == 0:
+            #             p.grad.data[
+            #             self._known_classes:,
+            #             : self._network_module_ptr.out_dim,
+            #             ] = torch.tensor(0.0)
+            # elif self.oofc != "ft":
+            #     assert 0, "not implemented"
+            # optimizer.step()
+            _, preds = torch.max(logits, dim=1)
+            correct += preds.eq(targets.expand_as(preds)).cpu().sum()
+            total += len(targets)
+            # scheduler.step()
+
             train_acc = np.around(tensor2numpy(correct) * 100 / total, decimals=2)
 
-            if epoch % 5 == 0:
-                test_acc = self._compute_accuracy(self._network, test_loader)
-                info = "Task {}, Epoch {}/{} => Loss {:.3f}, Train_accy {:.2f}, Test_accy {:.2f}".format(
-                    self._cur_task,
-                    epoch + 1,
-                    self.args["init_epochs"],
-                    losses / len(train_loader),
-                    train_acc,
-                    test_acc,
-                )
-            else:
-                info = "Task {}, Epoch {}/{} => Loss {:.3f}, Train_accy {:.2f}".format(
-                    self._cur_task,
-                    epoch + 1,
-                    self.args["init_epochs"],
-                    losses / len(train_loader),
-                    train_acc,
-                )
-
-            prog_bar.set_description(info)
-            print(info)
-
-    def _feature_boosting(self, train_loader, test_loader, optimizer, scheduler):
-        prog_bar = tqdm(range(self.args["boosting_epochs"]))
-        for _, epoch in enumerate(prog_bar):
-            self.train()
-            losses = 0.0
-            losses_clf = 0.0
-            losses_fe = 0.0
-            losses_kd = 0.0
+            return outputs["logits"], train_acc, loss
+        else:
             correct, total = 0, 0
-            for i, (_, inputs, targets) in enumerate(train_loader):
-                inputs, targets = inputs.to(
-                    self._device, non_blocking=True
-                ), targets.to(self._device, non_blocking=True)
-                outputs = self._network(inputs)
-                logits, fe_logits, old_logits = (
-                    outputs["logits"],
-                    outputs["fe_logits"],
-                    outputs["old_logits"].detach(),
-                )
-                loss_clf = F.cross_entropy(logits / self.per_cls_weights, targets)
-                loss_fe = F.cross_entropy(fe_logits, targets)
-                loss_kd = self.lambda_okd * _KD_loss(
-                    logits[:, : self._known_classes], old_logits, self.args["T"]
-                )
-                loss = loss_clf + loss_fe + loss_kd
-                optimizer.zero_grad()
-                loss.backward()
-                if self.oofc == "az":
-                    for i, p in enumerate(self._network_module_ptr.fc.parameters()):
-                        if i == 0:
-                            p.grad.data[
-                            self._known_classes:,
-                            : self._network_module_ptr.out_dim,
-                            ] = torch.tensor(0.0)
-                elif self.oofc != "ft":
-                    assert 0, "not implemented"
-                optimizer.step()
-                losses += loss.item()
-                losses_fe += loss_fe.item()
-                losses_clf += loss_clf.item()
-                losses_kd += (
-                                     self._known_classes / self._total_classes
-                             ) * loss_kd.item()
-                _, preds = torch.max(logits, dim=1)
-                correct += preds.eq(targets.expand_as(preds)).cpu().sum()
-                total += len(targets)
-            scheduler.step()
+            inputs, targets = data["image"], data["label"]
+            inputs, targets = inputs.to(
+                self._device, non_blocking=True
+            ), targets.to(self._device, non_blocking=True)
+            logits = self._network(inputs)["logits"]
+            loss = F.cross_entropy(logits, targets)
+            #optimizer.zero_grad()
+            #loss.backward()
+            #optimizer.step()
+            _, preds = torch.max(logits, dim=1)
+            correct += preds.eq(targets.expand_as(preds)).cpu().sum()
+            total += len(targets)
             train_acc = np.around(tensor2numpy(correct) * 100 / total, decimals=2)
-            if epoch % 5 == 0:
-                test_acc = self._compute_accuracy(self._network, test_loader)
-                info = "Task {}, Epoch {}/{} => Loss {:.3f}, Loss_clf {:.3f}, Loss_fe {:.3f}, Loss_kd {:.3f}, Train_accy {:.2f}, Test_accy {:.2f}".format(
-                    self._cur_task,
-                    epoch + 1,
-                    self.args["boosting_epochs"],
-                    losses / len(train_loader),
-                    losses_clf / len(train_loader),
-                    losses_fe / len(train_loader),
-                    losses_kd / len(train_loader),
-                    train_acc,
-                    test_acc,
-                )
-            else:
-                info = "Task {}, Epoch {}/{} => Loss {:.3f}, Loss_clf {:.3f}, Loss_fe {:.3f}, Loss_kd {:.3f}, Train_accy {:.2f}".format(
-                    self._cur_task,
-                    epoch + 1,
-                    self.args["boosting_epochs"],
-                    losses / len(train_loader),
-                    losses_clf / len(train_loader),
-                    losses_fe / len(train_loader),
-                    losses_kd / len(train_loader),
-                    train_acc,
-                )
-            prog_bar.set_description(info)
-            print(info)
+            return logits, train_acc, loss
+
+    def after_backward(self):
+        if self._cur_task > 0:
+
+            if self.oofc == "az":
+                for i, p in enumerate(self._network_module_ptr.fc.parameters()):
+                    if i == 0:
+                        p.grad.data[
+                        self._known_classes:,
+                        : self._network_module_ptr.out_dim,
+                        ] = torch.tensor(0.0)
+            elif self.oofc != "ft":
+                assert 0, "not implemented"
+    def inference(self, data):
+        inputs, targets = data["image"], data["label"]
+        y_pred,y_true = [],[]
+        inputs = inputs.to(self._device, non_blocking=True)
+        with torch.no_grad():
+            outputs = self._network(inputs)["logits"]
+        predicts = torch.argmax(outputs, dim=1)
+        y_pred.append(predicts.cpu().numpy())
+        y_true.append(targets.cpu().numpy())
+        y_pred = np.concatenate(y_pred)
+        y_true = np.concatenate(y_true)
+        acc = (y_pred == y_true).sum() * 100 / len(y_true)
+        return outputs, acc
+
+    def train(self):
+        self._network_module_ptr.train()
+        self._network_module_ptr.convnets[-1].train()
+        if self._cur_task >= 1:
+            self._network_module_ptr.convnets[0].eval()
+    def eval(self):
+        self._network.eval()
+
+    def parameters(self) :
+        return self._network.parameters()
+
 
     def _feature_compression(self, train_loader, test_loader):
         self._snet = FOSTERNet(self.args, False)
         self._snet.update_fc(self._total_classes)
-        if len(self._multiple_gpus) > 1:
-            self._snet = nn.DataParallel(self._snet, self._multiple_gpus)
         if hasattr(self._snet, "module"):
             self._snet_module_ptr = self._snet.module
         else:
@@ -409,7 +252,8 @@ class FOSTER(Finetune):
             self._snet.train()
             losses = 0.0
             correct, total = 0, 0
-            for i, (_, inputs, targets) in enumerate(train_loader):
+            for i, batch in enumerate(train_loader):
+                inputs, targets = batch["image"], batch["label"]
                 inputs, targets = inputs.to(
                     self._device, non_blocking=True
                 ), targets.to(self._device, non_blocking=True)
@@ -452,8 +296,6 @@ class FOSTER(Finetune):
                 )
             prog_bar.set_description(info)
             print(info)
-        if len(self._multiple_gpus) > 1:
-            self._snet = self._snet.module
         if self.is_student_wa:
             self._snet.weight_align(
                 self._known_classes,
@@ -465,21 +307,19 @@ class FOSTER(Finetune):
 
         self._snet.eval()
         y_pred, y_true = [], []
-        for _, (_, inputs, targets) in enumerate(test_loader):
+        for _, batch in enumerate(test_loader):
+            inputs,targets = batch["image"], batch["label"]
             inputs = inputs.to(self._device, non_blocking=True)
             with torch.no_grad():
                 outputs = self._snet(inputs)["logits"]
-            predicts = torch.topk(
-                outputs, k=self.topk, dim=1, largest=True, sorted=True
-            )[1]
+            predicts = torch.argmax(outputs,dim=1)
             y_pred.append(predicts.cpu().numpy())
             y_true.append(targets.cpu().numpy())
         y_pred = np.concatenate(y_pred)
         y_true = np.concatenate(y_true)
-        cnn_accy = self._evaluate(y_pred, y_true)
+        cnn_accy = (y_pred == y_true).sum() * 100 / len(y_true)
         print("darknet eval: ")
-        print("CNN top1 curve: {}".format(cnn_accy["top1"]))
-        print("CNN top5 curve: {}".format(cnn_accy["top5"]))
+        print("CNN top1 curve: {}".format(cnn_accy))
 
     @property
     def samples_old_class(self):
@@ -490,17 +330,21 @@ class FOSTER(Finetune):
             return self._memory_size // self._known_classes
 
     def samples_new_class(self, index):
-        if self.args["dataset"] == "cifar100":
-            return 500
-        else:
-            return self.data_manager.getlen(index)
-
+        # if self.args["dataset"] == "cifar100":
+        #     return 500
+        # else:
+        #     return self.data_manager.getlen(index)
+        return (len(self.train_loader.dataset)-self._memory_per_class*self._known_classes) // self.inc_cls_num
     def BKD(self, pred, soft, T):
         pred = torch.log_softmax(pred / T, dim=1)
         soft = torch.softmax(soft / T, dim=1)
         soft = soft * self.per_cls_weights
         soft = soft / soft.sum(1)[:, None]
         return -1 * torch.mul(soft, pred).sum() / pred.shape[0]
+
+    @property
+    def backbone(self):
+        return self._network.convnets
 
     # from Baselearner:
     @property
@@ -525,34 +369,11 @@ class FOSTER(Finetune):
         else:
             return self._network.feature_dim
 
-    def build_rehearsal_memory(self, data_manager, per_class):
-        if self._fixed_memory:
-            self._construct_exemplar_unified(data_manager, per_class)
-        else:
-            assert 0, "only support fixed_memory yet"
-
-    def _evaluate(self, y_pred, y_true):
-        ret = {}
-        grouped = accuracy(y_pred.T[0], y_true, self._known_classes)
-        ret["grouped"] = grouped
-        ret["top1"] = grouped["total"]
-        ret["top{}".format(self.topk)] = np.around(
-            (y_pred.T == np.tile(y_true, (self.topk, 1))).sum() * 100 / len(y_true),
-            decimals=2,
-        )
-
-        return ret
-
-    def _get_memory(self):
-        if len(self._data_memory) == 0:
-            return None
-        else:
-            return (self._data_memory, self._targets_memory)
-
     def _compute_accuracy(self, model, loader):
         model.eval()
         correct, total = 0, 0
-        for i, (_, inputs, targets) in enumerate(loader):
+        for i, batch in enumerate(loader):
+            inputs, targets = batch["image"], batch["label"]
             inputs = inputs.to(self._device)
             with torch.no_grad():
                 outputs = model(inputs)["logits"]
@@ -561,125 +382,6 @@ class FOSTER(Finetune):
             total += len(targets)
 
         return np.around(tensor2numpy(correct) * 100 / total, decimals=2)
-
-    def _extract_vectors(self, loader):
-        self._network.eval()
-        vectors, targets = [], []
-        for _, _inputs, _targets in loader:
-            _targets = _targets.numpy()
-            if isinstance(self._network, nn.DataParallel):
-                _vectors = tensor2numpy(
-                    self._network.module.extract_vector(_inputs.to(self._device))
-                )
-            else:
-                _vectors = tensor2numpy(
-                    self._network.extract_vector(_inputs.to(self._device))
-                )
-
-            vectors.append(_vectors)
-            targets.append(_targets)
-
-        return np.concatenate(vectors), np.concatenate(targets)
-
-    def _construct_exemplar_unified(self, data_manager, m):
-        print(
-            "Constructing exemplars for new classes...({} per classes)".format(m)
-        )
-        _class_means = np.zeros((self._total_classes, self.feature_dim))
-
-        # Calculate the means of old classes with newly trained network
-        for class_idx in range(self._known_classes):
-            mask = np.where(self._targets_memory == class_idx)[0]
-            class_data, class_targets = (
-                self._data_memory[mask],
-                self._targets_memory[mask],
-            )
-
-            class_dset = data_manager.get_dataset(
-                [], source="train", mode="test", appendent=(class_data, class_targets)
-            )
-            class_loader = DataLoader(
-                class_dset, batch_size=batch_size, shuffle=False, num_workers=4
-            )
-            vectors, _ = self._extract_vectors(class_loader)
-            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + EPSILON)).T
-            mean = np.mean(vectors, axis=0)
-            mean = mean / np.linalg.norm(mean)
-
-            _class_means[class_idx, :] = mean
-
-        # Construct exemplars for new classes and calculate the means
-        for class_idx in range(self._known_classes, self._total_classes):
-            data, targets, class_dset = data_manager.get_dataset(
-                np.arange(class_idx, class_idx + 1),
-                source="train",
-                mode="test",
-                ret_data=True,
-            )
-            class_loader = DataLoader(
-                class_dset, batch_size=batch_size, shuffle=False, num_workers=4
-            )
-
-            vectors, _ = self._extract_vectors(class_loader)
-            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + EPSILON)).T
-            class_mean = np.mean(vectors, axis=0)
-
-            # Select
-            selected_exemplars = []
-            exemplar_vectors = []
-            for k in range(1, m + 1):
-                S = np.sum(
-                    exemplar_vectors, axis=0
-                )  # [feature_dim] sum of selected exemplars vectors
-                mu_p = (vectors + S) / k  # [n, feature_dim] sum to all vectors
-                i = np.argmin(np.sqrt(np.sum((class_mean - mu_p) ** 2, axis=1)))
-
-                selected_exemplars.append(
-                    np.array(data[i])
-                )  # New object to avoid passing by inference
-                exemplar_vectors.append(
-                    np.array(vectors[i])
-                )  # New object to avoid passing by inference
-
-                vectors = np.delete(
-                    vectors, i, axis=0
-                )  # Remove it to avoid duplicative selection
-                data = np.delete(
-                    data, i, axis=0
-                )  # Remove it to avoid duplicative selection
-
-            selected_exemplars = np.array(selected_exemplars)
-            exemplar_targets = np.full(m, class_idx)
-            self._data_memory = (
-                np.concatenate((self._data_memory, selected_exemplars))
-                if len(self._data_memory) != 0
-                else selected_exemplars
-            )
-            self._targets_memory = (
-                np.concatenate((self._targets_memory, exemplar_targets))
-                if len(self._targets_memory) != 0
-                else exemplar_targets
-            )
-
-            # Exemplar mean
-            exemplar_dset = data_manager.get_dataset(
-                [],
-                source="train",
-                mode="test",
-                appendent=(selected_exemplars, exemplar_targets),
-            )
-            exemplar_loader = DataLoader(
-                exemplar_dset, batch_size=batch_size, shuffle=False, num_workers=4
-            )
-            vectors, _ = self._extract_vectors(exemplar_loader)
-            vectors = (vectors.T / (np.linalg.norm(vectors.T, axis=0) + EPSILON)).T
-            mean = np.mean(vectors, axis=0)
-            mean = mean / np.linalg.norm(mean)
-
-            _class_means[class_idx, :] = mean
-
-        self._class_means = _class_means
-
 
 def _KD_loss(pred, soft, T):
     pred = torch.log_softmax(pred / T, dim=1)

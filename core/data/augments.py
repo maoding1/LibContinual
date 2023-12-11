@@ -87,6 +87,12 @@ def get_augment_method(
     #     else:
     #         raise RuntimeError
     trfms_list = []
+    if mode == "train":
+        trfms_list = [
+        transforms.RandomCrop(32, padding=4),
+        transforms.RandomHorizontalFlip(),
+        transforms.ColorJitter(brightness=63 / 255)
+    ]
     return trfms_list
 
 def get_default_image_size_trfms(image_size):

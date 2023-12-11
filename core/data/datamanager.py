@@ -1,15 +1,18 @@
-import logging
+import os
+
 import numpy as np
 from PIL import Image
 from torch.utils.data import Dataset
 from torchvision import transforms, datasets
 from tqdm import tqdm
 
+from core.data.dataset import SingleDataseat
+
 
 class DataManager(object):
-    def __init__(self, dataset_name, shuffle, seed, init_cls, increment):
-        self.dataset_name = dataset_name
-        self._setup_data(dataset_name, shuffle, seed)
+    def __init__(self, dataset_root, total_class_num,shuffle, seed, init_cls, increment):
+        # self.dataset_name = dataset_name
+        self._setup_data(dataset_root, total_class_num, shuffle, seed)
         assert init_cls <= len(self._class_order), "No enough classes."
         self._increments = [init_cls]
         while sum(self._increments) + increment < len(self._class_order):
@@ -182,9 +185,9 @@ class DataManager(object):
             train_data, train_targets, trsf, self.use_path
         ), DummyDataset(val_data, val_targets, trsf, self.use_path)
 
-    def _setup_data(self, dataset_name, shuffle, seed):
-        idata = _get_idata(dataset_name)
-        idata.download_data()
+    def _setup_data(self, dataset_root, total_class_num,shuffle, seed):
+        idata = _get_idata(dataset_root, total_class_num)
+        idata.get_data()
 
         # Data
         self._train_data, self._train_targets = idata.train_data, idata.train_targets
@@ -204,7 +207,7 @@ class DataManager(object):
         else:
             order = idata.class_order
         self._class_order = order
-        logging.info(self._class_order)
+        print(self._class_order)
 
         # Map indices
         self._train_targets = _map_new_class_index(
@@ -266,12 +269,13 @@ def _map_new_class_index(y, order):
     return np.array(list(map(lambda x: order.index(x), y)))
 
 
-def _get_idata(dataset_name):
-    name = dataset_name.lower()
-    if name == "cifar100":
-        return iCIFAR100()
-    else:
-        raise NotImplementedError("Unknown dataset {}.".format(dataset_name))
+def _get_idata(dataset_root, total_class_num):
+    return SimpleSet(dataset_root, total_class_num)
+    # name = dataset_name.lower()
+    # if name == "cifar100":
+    #     return iCIFAR100()
+    # else:
+    #     raise NotImplementedError("Unknown dataset {}.".format(dataset_name))
 
 
 def pil_loader(path):
@@ -284,26 +288,49 @@ def pil_loader(path):
         img = Image.open(f)
         return img.convert("RGB")
 
-class iCIFAR100():
-    use_path = False
-    train_trsf = [
-        transforms.RandomCrop(32, padding=4),
-        transforms.RandomHorizontalFlip(),
-        transforms.ColorJitter(brightness=63 / 255),
-        transforms.ToTensor()
-    ]
-    test_trsf = [transforms.ToTensor()]
-    common_trsf = [
-        transforms.Normalize(
-            mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761)
-        ),
-    ]
+class SimpleSet():
+    def __init__(self,dataset_root, total_class_num):
+        self.dataset_root = dataset_root
+        self.total_class_num = total_class_num
+        self.use_path = False
+        self.train_trsf = [
+            transforms.RandomCrop(32, padding=4),
+            transforms.RandomHorizontalFlip(),
+            transforms.ColorJitter(brightness=63 / 255),
+            transforms.ToTensor()
+        ]
+        self.test_trsf = [transforms.ToTensor()]
+        self.common_trsf = [
+            transforms.Normalize(
+                mean=(0.5071, 0.4867, 0.4408), std=(0.2675, 0.2565, 0.2761)
+            ),
+        ]
 
-    class_order = np.arange(100).tolist()
+        # self.class_order = np.arange(total_class_num).tolist()
+        # self.class_order = [str(idx) for idx in self.class_order]
+        cls_list = os.listdir(os.path.join(dataset_root, "train"))
+        perm = np.random.permutation(len(cls_list))
+        cls_map = dict()
+        for label, ori_label in enumerate(perm):
+            cls_map[label] = cls_list[ori_label]
+        self.cls_map = cls_map
 
-    def download_data(self):
+    def get_data(self):
         train_dataset = datasets.cifar.CIFAR100("./data", train=True, download=True)
         test_dataset = datasets.cifar.CIFAR100("./data", train=False, download=True)
+        # train_dataset = SingleDataseat(self.dataset_root, mode="train",
+        #                                cls_map=self.cls_map, start_idx=0,
+        #                                end_idx=self.total_class_num, trfms=self.train_trsf)
+        # test_dataset = SingleDataseat(self.dataset_root, mode="test",
+        #                               cls_map=self.cls_map, start_idx=0,
+        #                               end_idx=self.total_class_num, trfms=self.train_trsf)
+
+        # self.train_data, self.train_targets = train_dataset.images, np.array(
+        #     train_dataset.labels
+        # )
+        # self.test_data, self.test_targets = test_dataset.images, np.array(
+        #     test_dataset.labels
+        # )
         self.train_data, self.train_targets = train_dataset.data, np.array(
             train_dataset.targets
         )
