@@ -125,6 +125,9 @@ class FOSTER(Finetune):
             #todo (FOSTER) fix concat bugs
             merged_loaders = list(chain.from_iterable(test_loaders))
             self._feature_compression(train_loader, merged_loaders)
+        # else:
+        #     PATH = "./state_dict_model_200iniEpochs.pth"
+        #     torch.save(self.state_dict(),PATH)
 
         self._known_classes = self._total_classes
         #print("Exemplar size: {}".format(self.exemplar_size))

@@ -37,53 +37,51 @@ def hearding_update(datasets, buffer, feature_extractor, device):
 
     buffer.images, buffer.labels = selected_images, selected_labels
 
-def herding_update_unified(datasets, buffer, feature_extractor, device, per_classes):
+def herding_update_unified(datasets, buffer, feature_extractor, device, per_classes, start_cls_idx, end_cls_idx,test_trsfs):
     selected_images, selected_labels = [], []
-    images = np.array(datasets.images + buffer.images)
-    labels = np.array(datasets.labels + buffer.labels)
+    images = np.array(datasets.images)
+    labels = np.array(datasets.labels)
 
-    for cls in range(buffer.total_classes):
+    for cls in range(start_cls_idx, end_cls_idx):
         print("Construct examplars for class {}".format(cls))
         cls_images_idx = np.where(labels == cls)
         cls_images, cls_labels = images[cls_images_idx], labels[cls_images_idx]
 
         cls_selected_images, cls_selected_labels = construct_examplar_foster(copy.copy(datasets), cls_images, cls_labels,
-                                                                      feature_extractor, per_classes, device)
+                                                                      feature_extractor, per_classes, device, test_trsfs)
         selected_images.extend(cls_selected_images)
         selected_labels.extend(cls_selected_labels)
 
-    buffer.images, buffer.labels = selected_images, selected_labels
+    buffer.images, buffer.labels = buffer.images+selected_images, buffer.labels+selected_labels
+    print("buffer length{}".format(len(buffer.images)))
 
-
-def construct_examplar_foster(datasets, images, labels, feature_extractor, per_classes, device):
+def construct_examplar_foster(datasets, images, labels, feature_extractor, per_classes, device, test_trsfs):
 
     if len(images) <= per_classes:
         return images, labels
 
     datasets.images, datasets.labels = images, labels
-    dataloader = DataLoader(datasets, shuffle=False, batch_size=32, drop_last=False, num_workers=4)
+    datasets.trfms = test_trsfs
+    dataloader = DataLoader(datasets, shuffle=False, batch_size=64, drop_last=False, num_workers=4)
 
     with torch.no_grad():
         features = []
         for data in dataloader:
             imgs = data['image'].to(device)
-            # with torch.no_grad():
             feature = [convnet(imgs)["features"] for convnet in feature_extractor]
-            feature = torch.cat(feature,1)
+            feature = tensor2numpy(torch.cat(feature,1))
             # features.append(feature)
-            features.append(feature.cpu().numpy().tolist())
+            features.append(feature)
 
     features = np.concatenate(features)
-    # features = (features.T / (np.linalg.norm(features.T, axis=0) + EPSILON)).T
+    features = (features.T / (np.linalg.norm(features.T, axis=0) + EPSILON)).T
+
     selected_images, selected_labels = [], []
     selected_features = []
     class_mean = np.mean(features, axis=0)
 
     for k in range(1, per_classes + 1):
-        if len(selected_features) == 0:
-            S = np.zeros_like(features[0])
-        else:
-            S = np.mean(np.array(selected_features), axis=0)
+        S = np.sum(selected_features, axis=0)
 
         mu_p = (S + features) / k
         i = np.argmin(np.sqrt(np.sum((class_mean - mu_p) ** 2, axis=1)))
@@ -138,6 +136,7 @@ def construct_examplar(datasets, images, labels, feature_extractor, per_classes,
     return selected_images, selected_labels
 
 
-
+def tensor2numpy(x):
+    return x.cpu().data.numpy() if x.is_cuda else x.data.numpy()
     
         

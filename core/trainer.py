@@ -280,6 +280,20 @@ class Trainer(object):
 
             best_acc = 0.
             for epoch_idx in range(self.init_epoch if task_idx == 0 else self.inc_epoch):
+                if  args["use_pretrain_init_state"] == True and task_idx == 0:
+                    print("skip init train and use pre_trained state_dict!")
+                    self.model.load_state_dict(torch.load(args["state_path"]))
+                    print("================ Test on the test set ================")
+                    test_acc = self._validate(task_idx)
+                    best_acc = max(test_acc["avg_acc"], best_acc)
+                    print(
+                        " * Average Acc: {:.3f} Best acc {:.3f}".format(test_acc["avg_acc"], best_acc)
+                    )
+                    print(
+                        " Per-Task Acc:{}".format(test_acc['per_task_acc'])
+                    )
+                    break
+
                 print("learning rate: {}".format(self.scheduler.get_last_lr()))
                 print("================ Train on the train set ================")
                 train_meter = self._train(epoch_idx, dataloader)
@@ -307,7 +321,11 @@ class Trainer(object):
             elif self.buffer.strategy == 'random':
                 random_update(self.train_loader.get_loader(task_idx).dataset, self.buffer)
             elif self.buffer.strategy == 'foster':
-                herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, 20)
+                per_classes_num = self.model._memory_per_class
+                start_cls_idx = 0 if task_idx == 0 else self.init_cls_num + (task_idx-1)* self.inc_cls_num
+                end_cls_idx = 50 if task_idx == 0 else start_cls_idx + self.inc_cls_num
+                test_trfms = self.test_loader.get_loader(task_idx)[-1].dataset.trfms
+                herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, per_classes_num,start_cls_idx, end_cls_idx,test_trfms)
 
 
 

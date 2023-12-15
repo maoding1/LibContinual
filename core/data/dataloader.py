@@ -31,7 +31,7 @@ def get_dataloader(config, mode, cls_map=None):
     data_root = config['data_root']
 
     trfms_list = get_augment_method(config, mode)
-    trfms_list.append(transforms.ToTensor())
+    # trfms_list.append(transforms.ToTensor())
     trfms_list.append(transforms.Normalize(mean=MEAN, std=STD))
     trfms = transforms.Compose(trfms_list)
 

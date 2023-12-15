@@ -24,9 +24,10 @@ class ContinualDatasets:
             end_idx = start_idx + (self.init_cls_num if i ==0 else self.inc_cls_num)
             self.dataloaders.append(DataLoader(
                 SingleDataseat(self.data_root, self.mode, self.cls_map, start_idx, end_idx, self.trfms),
-                shuffle = True,
-                batch_size = 32,
-                drop_last = True
+                shuffle = True if self.mode == "train" else False,
+                batch_size = 128,
+                drop_last = False,
+                pin_memory=True
             ))
 
     def get_loader(self, task_idx):
