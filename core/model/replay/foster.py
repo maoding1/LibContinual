@@ -39,21 +39,10 @@ class FOSTER(Finetune):
         self._total_classes = 0
         self._old_network = None
 
-        # self._data_memory, self._targets_memory = np.array([]), np.array([])
-        # self.topk = 5
-        # todo: (FOSTER)replace with buffer and dataloader and fix device things
-        #self._memory_size = args["memory_size"]
         self._memory_per_class = args.get("memory_per_class", None)
         self._fixed_memory = args.get("fixed_memory", False)
         self._device = args["device"]
-        # self.data_manager = DataManager(
-        #     args["data_root"],
-        #     num_class,
-        #     args["shuffle"],
-        #     args["seed"],
-        #     args["init_cls_num"],
-        #     args["inc_cls_num"],
-        # )
+
     def before_task(self, task_idx, buffer, train_loader, test_loaders):
         self.buffer = buffer
         self.train_loader = train_loader

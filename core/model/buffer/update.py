@@ -38,6 +38,9 @@ def hearding_update(datasets, buffer, feature_extractor, device):
     buffer.images, buffer.labels = selected_images, selected_labels
 
 def herding_update_unified(datasets, buffer, feature_extractor, device, per_classes, start_cls_idx, end_cls_idx,test_trsfs):
+    """
+        construct examplers with fixed numbers(per_classes) from start_cls_idx to end_cls_idx using herding strategy
+    """
     selected_images, selected_labels = [], []
     images = np.array(datasets.images)
     labels = np.array(datasets.labels)
@@ -53,7 +56,7 @@ def herding_update_unified(datasets, buffer, feature_extractor, device, per_clas
         selected_labels.extend(cls_selected_labels)
 
     buffer.images, buffer.labels = buffer.images+selected_images, buffer.labels+selected_labels
-    print("buffer length{}".format(len(buffer.images)))
+    # print("buffer length{}".format(len(buffer.images)))
 
 def construct_examplar_foster(datasets, images, labels, feature_extractor, per_classes, device, test_trsfs):
 
@@ -96,6 +99,15 @@ def construct_examplar_foster(datasets, images, labels, feature_extractor, per_c
 
     return selected_images, selected_labels
 
+def reduce_buffer_examplar(buffer, per_classes_num, start_cls_idx):
+    print('Reducing exemplars...({} per classes)'.format(per_classes_num))
+    images , labels = np.array(buffer.images), np.array(buffer.labels)
+    buffer.images, buffer.labels = [], []
+    for class_idx in range(start_cls_idx):
+        cls_images_idx = np.where(labels == class_idx)
+        cls_images, cls_labels = images[cls_images_idx][:per_classes_num], labels[cls_images_idx][:per_classes_num]
+        buffer.images.extend(cls_images)
+        buffer.labels.extend(cls_labels)
 
 def construct_examplar(datasets, images, labels, feature_extractor, per_classes, device):
     if len(images) <= per_classes:

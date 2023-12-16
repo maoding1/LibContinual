@@ -55,7 +55,7 @@ num_workers: 8
 buffer:
   name: LinearBuffer
   kwargs:
-    buffer_size: 500
+    buffer_size: 2000
     batch_size: 32       # has no effect on LinearBuffer
     strategy: foster    # random, equal_random, reservoir, herding
 

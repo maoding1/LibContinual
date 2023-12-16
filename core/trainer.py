@@ -321,12 +321,16 @@ class Trainer(object):
             elif self.buffer.strategy == 'random':
                 random_update(self.train_loader.get_loader(task_idx).dataset, self.buffer)
             elif self.buffer.strategy == 'foster':
-                per_classes_num = self.model._memory_per_class
-                start_cls_idx = 0 if task_idx == 0 else self.init_cls_num + (task_idx-1)* self.inc_cls_num
+                start_cls_idx = 0 if task_idx == 0 else self.init_cls_num + (task_idx - 1) * self.inc_cls_num
                 end_cls_idx = 50 if task_idx == 0 else start_cls_idx + self.inc_cls_num
                 test_trfms = self.test_loader.get_loader(task_idx)[-1].dataset.trfms
-                herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, per_classes_num,start_cls_idx, end_cls_idx,test_trfms)
-
+                if self.model._fixed_memory:
+                    per_classes_num = self.model._memory_per_class
+                    herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, per_classes_num,start_cls_idx, end_cls_idx,test_trfms)
+                else:
+                    per_classes_num = self.buffer.buffer_size // self.buffer.total_classes
+                    reduce_buffer_examplar(self.buffer, per_classes_num, start_cls_idx)
+                    herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, per_classes_num, start_cls_idx,end_cls_idx,test_trfms)
 
 
     def _train(self, epoch_idx, dataloader):
