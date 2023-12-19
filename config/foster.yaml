@@ -4,10 +4,13 @@ includes:
 save_path: ./
 data_root: /root/autodl-tmp/cifar100
 
-init_cls_num: 50
-inc_cls_num: 10
+use_pretrain_init_state: False
+state_path: ./state_dict_model_200iniEpochs.pth
+
+init_cls_num: 20
+inc_cls_num: 20
 total_cls_num: 100
-task_num: 6
+task_num: 5
 init_epoch: 200
 val_per_epoch: 10
 epoch: 170 # stands for boosting_epochs
@@ -32,7 +35,7 @@ classifier:
   kwargs:
     num_class: 100
     feat_dim: 64
-    beta1: 0.94
+    beta1: [0.97, 0.96, 0.95, 0.94] #0.95
     beta2: 0.97
     is_teacher_wa: false
     is_student_wa: false
@@ -41,11 +44,12 @@ classifier:
     oofc: "ft"
     convnet_type: "resnet32"
     T: 2
-    fixed_memory: True
+    fixed_memory: False
     memory_per_class: 20
 
     lr: 0.1
     compression_epochs: 130
+    samples_new_class: 500 # number of train samples per class
 
 
 batch_size: 128

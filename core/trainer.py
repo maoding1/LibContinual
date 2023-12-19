@@ -322,7 +322,7 @@ class Trainer(object):
                 random_update(self.train_loader.get_loader(task_idx).dataset, self.buffer)
             elif self.buffer.strategy == 'foster':
                 start_cls_idx = 0 if task_idx == 0 else self.init_cls_num + (task_idx - 1) * self.inc_cls_num
-                end_cls_idx = 50 if task_idx == 0 else start_cls_idx + self.inc_cls_num
+                end_cls_idx = self.init_cls_num if task_idx == 0 else start_cls_idx + self.inc_cls_num
                 test_trfms = self.test_loader.get_loader(task_idx)[-1].dataset.trfms
                 if self.model._fixed_memory:
                     per_classes_num = self.model._memory_per_class
