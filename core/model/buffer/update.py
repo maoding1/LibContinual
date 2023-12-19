@@ -41,9 +41,12 @@ def herding_update_unified(datasets, buffer, feature_extractor, device, per_clas
     selected_images, selected_labels = [], []
     images = np.array(datasets.images + buffer.images)
     labels = np.array(datasets.labels + buffer.labels)
-
+    # TODO：类别均值会用到嘛？在模型代码那里是eval_task会用到
     for cls in range(buffer.total_classes):
+        # TODO:模型的代码是扩展，每次只看新增的类别数据，会不会是这里有问题
         print("Construct examplars for class {}".format(cls))
+        # TODO:[0]?
+        #  mask = np.where(self._targets_memory == class_idx)[0]
         cls_images_idx = np.where(labels == cls)
         cls_images, cls_labels = images[cls_images_idx], labels[cls_images_idx]
 
@@ -71,9 +74,10 @@ def construct_examplar_foster(datasets, images, labels, feature_extractor, per_c
             feature = [convnet(imgs)["features"] for convnet in feature_extractor]
             feature = torch.cat(feature,1)
             # features.append(feature)
+            # _vectors = tensor2numpy(feature)
             features.append(feature.cpu().numpy().tolist())
 
-    features = np.concatenate(features)
+    features = np.concatenate(features) #对应的是self._extract_vectors
     # features = (features.T / (np.linalg.norm(features.T, axis=0) + EPSILON)).T
     selected_images, selected_labels = [], []
     selected_features = []

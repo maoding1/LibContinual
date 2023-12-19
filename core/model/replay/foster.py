@@ -126,6 +126,7 @@ class FOSTER(Finetune):
             merged_loaders = list(chain.from_iterable(test_loaders))
             self._feature_compression(train_loader, merged_loaders)
 
+        # 对应after_task
         self._known_classes = self._total_classes
         #print("Exemplar size: {}".format(self.exemplar_size))
         # self.build_rehearsal_memory(data_manager, self.samples_per_class)
