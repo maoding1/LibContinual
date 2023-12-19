@@ -39,22 +39,14 @@ class FOSTER(Finetune):
         self._total_classes = 0
         self._old_network = None
 
-        # self._data_memory, self._targets_memory = np.array([]), np.array([])
-        # self.topk = 5
-        # todo: (FOSTER)replace with buffer and dataloader and fix device things
-        #self._memory_size = args["memory_size"]
         self._memory_per_class = args.get("memory_per_class", None)
         self._fixed_memory = args.get("fixed_memory", False)
         self._device = args["device"]
-        # self.data_manager = DataManager(
-        #     args["data_root"],
-        #     num_class,
-        #     args["shuffle"],
-        #     args["seed"],
-        #     args["init_cls_num"],
-        #     args["inc_cls_num"],
-        # )
+        self.samples_new_cls = args["samples_new_class"]
+
     def before_task(self, task_idx, buffer, train_loader, test_loaders):
+        if task_idx == 0:
+            self._memory_size = buffer.buffer_size
         self.buffer = buffer
         self.train_loader = train_loader
 
@@ -78,8 +70,12 @@ class FOSTER(Finetune):
                 for i in range(self._known_classes, self._total_classes)
             ]
 
-            effective_num = 1.0 - np.power(self.beta1, cls_num_list)
-            per_cls_weights = (1.0 - self.beta1) / np.array(effective_num)
+            if isinstance(self.beta1,list):
+                beta1=self.beta1[self._cur_task-1]
+            else:
+                beta1=self.beta1
+            effective_num = 1.0 - np.power(beta1, cls_num_list)
+            per_cls_weights = (1.0 - beta1) / np.array(effective_num)
             per_cls_weights = (
                     per_cls_weights / np.sum(per_cls_weights) * len(cls_num_list)
             )
@@ -125,6 +121,9 @@ class FOSTER(Finetune):
             #todo (FOSTER) fix concat bugs
             merged_loaders = list(chain.from_iterable(test_loaders))
             self._feature_compression(train_loader, merged_loaders)
+        # else:
+        #     PATH = "./state_dict_model_200iniEpochs.pth"
+        #     torch.save(self.state_dict(),PATH)
 
         # 对应after_task
         self._known_classes = self._total_classes
@@ -331,11 +330,7 @@ class FOSTER(Finetune):
             return self._memory_size // self._known_classes
 
     def samples_new_class(self, index):
-        # if self.args["dataset"] == "cifar100":
-        #     return 500
-        # else:
-        #     return self.data_manager.getlen(index)
-        return (len(self.train_loader.dataset)-self._memory_per_class*self._known_classes) // self.inc_cls_num
+        return self.samples_new_cls
     def BKD(self, pred, soft, T):
         pred = torch.log_softmax(pred / T, dim=1)
         soft = torch.softmax(soft / T, dim=1)

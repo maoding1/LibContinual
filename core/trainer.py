@@ -32,10 +32,10 @@ class Trainer(object):
         #     self.checkpoints_path, 
         #     self.viz_path
         # ) = self._init_files(config)                     # todo   add file manage
-        self.logger = self._init_logger(config)
-        self.device = self._init_device(config)
+        self.logger = self._init_logger(config)           
+        self.device = self._init_device(config) 
         # self.writer = self._init_writer(self.viz_path)   # todo   add tensorboard
-
+        
         print(self.config)
 
         self.init_cls_num, self.inc_cls_num, self.task_num = self._init_data(config)
@@ -44,7 +44,7 @@ class Trainer(object):
             self.train_loader,
             self.test_loader,
         ) = self._init_dataloader(config)
-
+        
         self.buffer = self._init_buffer(config)
         """
             修改原因：
@@ -82,8 +82,7 @@ class Trainer(object):
         log_path = os.path.join(save_path, "log")
         if not os.path.isdir(log_path):
             os.mkdir(log_path)
-        log_prefix = config['classifier']['name'] + "-" + config['backbone'][
-            'name'] + "-" + f"epoch{config['epoch']}"  # mode
+        log_prefix = config['classifier']['name'] + "-" + config['backbone']['name'] + "-" + f"epoch{config['epoch']}" #mode
         log_file = os.path.join(log_path, "{}-{}.log".format(log_prefix, fmt_date_str()))
 
         # if not os.path.isfile(log_file):
@@ -112,6 +111,7 @@ class Trainer(object):
         device = torch.device("cuda:{}".format(config['device_ids']))
 
         return device
+
 
     def _init_files(self, config):
         pass
@@ -151,7 +151,7 @@ class Trainer(object):
             tuple: A tuple of optimizer, scheduler.
         """
         params_dict_list = {"params": self.model.parameters()}
-
+    
         optimizer = get_instance(
             torch.optim, "optimizer", config, params=self.model.parameters()
         )
@@ -195,11 +195,11 @@ class Trainer(object):
 
         model = get_instance(arch, "classifier", config, **dic)
         print(model)
-        print("Trainable params in the model: {}".format(count_parameters(model, trainable=True)))
+        print("Trainable params in the model: {}".format(count_parameters(model,trainable=True)))
 
         model = model.to(self.device)
         return model
-
+    
     def _init_dataloader(self, config):
         '''
         Init DataLoader
@@ -215,7 +215,7 @@ class Trainer(object):
         test_loaders = get_dataloader(config, "test", cls_map=train_loaders.cls_map)
 
         return train_loaders, test_loaders
-
+    
     def _init_buffer(self, config):
         '''
         Init Buffer
@@ -230,7 +230,7 @@ class Trainer(object):
 
         return buffer
 
-    def train_loop(self, args):
+    def train_loop(self,args):
         """
         The norm train loop:  before_task, train, test, after_task
         """
@@ -269,27 +269,21 @@ class Trainer(object):
                 datasets.labels.extend(self.buffer.labels)
                 dataloader = DataLoader(
                     datasets,
-                    shuffle=True,
-                    batch_size=self.config['batch_size'],
-                    drop_last=False,
+                    shuffle = True,
+                    batch_size = self.config['batch_size'],
+                    drop_last = False,
                     num_workers=4,
                     pin_memory=True
                 )
-
+            
             print("================Task {} Training!================".format(task_idx))
             print("The training samples number: {}".format(len(dataloader.dataset)))
 
             best_acc = 0.
             for epoch_idx in range(self.init_epoch if task_idx == 0 else self.inc_epoch):
-                print("learning rate: {}".format(self.scheduler.get_last_lr()))
-                print("================ Train on the train set ================")
-                train_meter = self._train(epoch_idx, dataloader)
-                print("Epoch [{}/{}] |\tLoss: {:.3f} \tAverage Acc: {:.3f} ".format(epoch_idx,
-                                                                                    self.init_epoch if task_idx == 0 else self.inc_epoch,
-                                                                                    train_meter.avg('loss'),
-                                                                                    train_meter.avg("acc1")))
-
-                if (epoch_idx + 1) % self.val_per_epoch == 0 or (epoch_idx + 1) == self.inc_epoch:
+                if  args["use_pretrain_init_state"] == True and task_idx == 0:
+                    print("skip init train and use pre_trained state_dict!")
+                    self.model.load_state_dict(torch.load(args["state_path"]))
                     print("================ Test on the test set ================")
                     test_acc = self._validate(task_idx)
                     best_acc = max(test_acc["avg_acc"], best_acc)
@@ -299,21 +293,46 @@ class Trainer(object):
                     print(
                         " Per-Task Acc:{}".format(test_acc['per_task_acc'])
                     )
+                    break
 
+                print("learning rate: {}".format(self.scheduler.get_last_lr()))
+                print("================ Train on the train set ================")
+                train_meter = self._train(epoch_idx, dataloader)
+                print("Epoch [{}/{}] |\tLoss: {:.3f} \tAverage Acc: {:.3f} ".format(epoch_idx, self.init_epoch if task_idx == 0 else self.inc_epoch, train_meter.avg('loss'), train_meter.avg("acc1")))
+
+                if (epoch_idx+1) % self.val_per_epoch == 0 or (epoch_idx+1)==self.inc_epoch:
+                    print("================ Test on the test set ================")
+                    test_acc = self._validate(task_idx)
+                    best_acc = max(test_acc["avg_acc"], best_acc)
+                    print(
+                    " * Average Acc: {:.3f} Best acc {:.3f}".format(test_acc["avg_acc"], best_acc)
+                    )
+                    print(
+                    " Per-Task Acc:{}".format(test_acc['per_task_acc'])
+                    )
+            
                 self.scheduler.step()
 
             if hasattr(self.model, 'after_task'):
-                self.model.after_task(task_idx, self.buffer, self.train_loader.get_loader(task_idx),
-                                      self.test_loader.get_loader(task_idx))
+                self.model.after_task(task_idx, self.buffer, self.train_loader.get_loader(task_idx), self.test_loader.get_loader(task_idx))
+
 
             if self.buffer.strategy == 'herding':
-                hearding_update(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone,
-                                self.device)
+                hearding_update(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device)
             elif self.buffer.strategy == 'random':
                 random_update(self.train_loader.get_loader(task_idx).dataset, self.buffer)
             elif self.buffer.strategy == 'foster':
-                herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone,
-                                       self.device, 20)
+                start_cls_idx = 0 if task_idx == 0 else self.init_cls_num + (task_idx - 1) * self.inc_cls_num
+                end_cls_idx = self.init_cls_num if task_idx == 0 else start_cls_idx + self.inc_cls_num
+                test_trfms = self.test_loader.get_loader(task_idx)[-1].dataset.trfms
+                if self.model._fixed_memory:
+                    per_classes_num = self.model._memory_per_class
+                    herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, per_classes_num,start_cls_idx, end_cls_idx,test_trfms)
+                else:
+                    per_classes_num = self.buffer.buffer_size // self.buffer.total_classes
+                    reduce_buffer_examplar(self.buffer, per_classes_num, start_cls_idx)
+                    herding_update_unified(self.train_loader.get_loader(task_idx).dataset, self.buffer, self.model.backbone, self.device, per_classes_num, start_cls_idx,end_cls_idx,test_trfms)
+
 
     def _train(self, epoch_idx, dataloader):
         """
@@ -328,6 +347,7 @@ class Trainer(object):
         self.model.train()
         meter = self.train_meter
         meter.reset()
+        
 
         with tqdm(total=len(dataloader)) as pbar:
             for batch_idx, batch in enumerate(dataloader):
@@ -336,25 +356,26 @@ class Trainer(object):
                 self.optimizer.zero_grad()
 
                 loss.backward()
-                # 新加的
                 if hasattr(self.model, 'after_backward'):
                     self.model.after_backward()
 
                 self.optimizer.step()
                 pbar.update(1)
-
+                
                 meter.update("acc1", acc)
                 meter.update("loss", loss.item())
 
+
         return meter
 
+
+
     def _validate(self, task_idx):
-        # 为什么是dataloaders？
         dataloaders = self.test_loader.get_loader(task_idx)
 
         self.model.eval()
         meter = self.test_meter
-
+        
         per_task_acc = []
         with torch.no_grad():
             for t, dataloader in enumerate(dataloaders):
@@ -364,5 +385,8 @@ class Trainer(object):
                     meter[t].update("acc1", acc)
 
                 per_task_acc.append(round(meter[t].avg("acc1"), 2))
+        
+        return {"avg_acc" : np.mean(per_task_acc), "per_task_acc" : per_task_acc}
+    
 
-        return {"avg_acc": np.mean(per_task_acc), "per_task_acc": per_task_acc}
+
