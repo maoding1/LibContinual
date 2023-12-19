@@ -130,62 +130,47 @@ class FOSTER(Finetune):
         # self.build_rehearsal_memory(data_manager, self.samples_per_class)
 
     def observe(self, data):
+        # 初始化正确和总计数器
+        correct, total = 0, 0
 
+        # 获取输入和目标
+        inputs, targets = data["image"], data["label"]
+        inputs, targets = inputs.to(self._device, non_blocking=True), targets.to(self._device, non_blocking=True)
+
+        # 前向传播
+        outputs = self._network(inputs)
         if self._cur_task > 0:
-            correct, total = 0, 0
-            inputs, targets = data["image"], data["label"]
-            inputs, targets = inputs.to(
-                self._device, non_blocking=True
-            ), targets.to(self._device, non_blocking=True)
-            outputs = self._network(inputs)
-            logits, fe_logits, old_logits = (
-                outputs["logits"],
-                outputs["fe_logits"],
-                outputs["old_logits"].detach(),
-            )
+            logits, fe_logits, old_logits = outputs["logits"], outputs["fe_logits"], outputs["old_logits"].detach()
             loss_clf = F.cross_entropy(logits / self.per_cls_weights, targets)
             loss_fe = F.cross_entropy(fe_logits, targets)
-            loss_kd = self.lambda_okd * _KD_loss(
-                logits[:, : self._known_classes], old_logits, self.args["T"]
-            )
+            loss_kd = self.lambda_okd * _KD_loss(logits[:, : self._known_classes], old_logits, self.args["T"])
             loss = loss_clf + loss_fe + loss_kd
-            # optimizer.zero_grad()
-            # loss.backward()
-            # todo(FOSTER) 没有进行backward
-            # if self.oofc == "az":
-            #     for i, p in enumerate(self._network_module_ptr.fc.parameters()):
-            #         if i == 0:
-            #             p.grad.data[
-            #             self._known_classes:,
-            #             : self._network_module_ptr.out_dim,
-            #             ] = torch.tensor(0.0)
-            # elif self.oofc != "ft":
-            #     assert 0, "not implemented"
-            # optimizer.step()
-            _, preds = torch.max(logits, dim=1)
-            correct += preds.eq(targets.expand_as(preds)).cpu().sum()
-            total += len(targets)
-            # scheduler.step()
-
-            train_acc = np.around(tensor2numpy(correct) * 100 / total, decimals=2)
-
-            return outputs["logits"], train_acc, loss
         else:
-            correct, total = 0, 0
-            inputs, targets = data["image"], data["label"]
-            inputs, targets = inputs.to(
-                self._device, non_blocking=True
-            ), targets.to(self._device, non_blocking=True)
-            logits = self._network(inputs)["logits"]
+            logits = outputs["logits"]
             loss = F.cross_entropy(logits, targets)
-            #optimizer.zero_grad()
-            #loss.backward()
-            #optimizer.step()
-            _, preds = torch.max(logits, dim=1)
-            correct += preds.eq(targets.expand_as(preds)).cpu().sum()
-            total += len(targets)
-            train_acc = np.around(tensor2numpy(correct) * 100 / total, decimals=2)
-            return logits, train_acc, loss
+
+        # 反向传播
+        self.optimizer.zero_grad()
+        loss.backward()
+        if self._cur_task > 0 and self.oofc == "az":
+            for i, p in enumerate(self._network_module_ptr.fc.parameters()):
+                if i == 0:
+                    p.grad.data[self._known_classes:, : self._network_module_ptr.out_dim] = torch.tensor(0.0)
+        elif self._cur_task > 0 and self.oofc != "ft":
+            assert 0, "not implemented"
+        self.optimizer.step()
+
+        # 更新学习率调度器
+        if hasattr(self, 'scheduler'):
+            self.scheduler.step()
+
+        # 计算准确率
+        _, preds = torch.max(logits, dim=1)
+        correct += preds.eq(targets.expand_as(preds)).cpu().sum()
+        total += len(targets)
+        train_acc = np.around(tensor2numpy(correct) * 100 / total, decimals=2)
+
+        return outputs["logits"], train_acc, loss
 
     def after_backward(self):
         if self._cur_task > 0:
