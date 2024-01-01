@@ -44,6 +44,14 @@ class FOSTER(Finetune):
         self._device = args["device"]
         self.samples_new_cls = args["samples_new_class"]
 
+    @property
+    def samples_per_class(self):
+        if self._fixed_memory:
+            return self._memory_per_class
+        else:
+            assert self._total_classes != 0, 'Total classes is 0'
+            return (self.buffer.buffer_size // self.buffer.total_classes)
+
     def before_task(self, task_idx, buffer, train_loader, test_loaders):
         if task_idx == 0:
             self._memory_size = buffer.buffer_size
@@ -125,7 +133,6 @@ class FOSTER(Finetune):
         #     PATH = "./state_dict_model_200iniEpochs.pth"
         #     torch.save(self.state_dict(),PATH)
 
-        # 对应after_task
         self._known_classes = self._total_classes
         #print("Exemplar size: {}".format(self.exemplar_size))
         # self.build_rehearsal_memory(data_manager, self.samples_per_class)
