@@ -240,7 +240,9 @@ class Trainer(object):
             print("Trainable params in the model: {}".format(count_parameters(self.model, trainable=True)))
             if hasattr(self.model, 'before_task'):
                 self.model.before_task(task_idx, self.buffer, self.train_loader.get_loader(task_idx), self.test_loader.get_loader(task_idx))
-
+            """
+                修改原因： init阶段的optimizer和scheduler单独指定 与 inc_train阶段不同
+            """
             if task_idx == 0:
                 self.optimizer = optim.SGD(
                     filter(lambda p: p.requires_grad, self.model.parameters()),
@@ -266,6 +268,9 @@ class Trainer(object):
                 datasets = dataloader.dataset
                 datasets.images.extend(self.buffer.images)
                 datasets.labels.extend(self.buffer.labels)
+                """
+                    增加了 num_workers属性 加快训练速度
+                """
                 dataloader = DataLoader(
                     datasets,
                     shuffle = True,
@@ -280,6 +285,9 @@ class Trainer(object):
 
             best_acc = 0.
             for epoch_idx in range(self.init_epoch if task_idx == 0 else self.inc_epoch):
+                """
+                    为了方便调试，加入了读取预训练的模型权重代码 可以跳过预训练阶段
+                """
                 if  args["use_pretrain_init_state"] == True and task_idx == 0:
                     print("skip init train and use pre_trained state_dict!")
                     self.model.load_state_dict(torch.load(args["state_path"]))
@@ -355,6 +363,9 @@ class Trainer(object):
                 self.optimizer.zero_grad()
 
                 loss.backward()
+                """
+                foster在反向传播后可能需要清零某些参数的梯度
+                """
                 if hasattr(self.model, 'after_backward'):
                     self.model.after_backward()
 
@@ -362,6 +373,9 @@ class Trainer(object):
                 pbar.update(1)
                 
                 meter.update("acc1", acc)
+                """
+                让训练日志能够成功打印loss
+                """
                 meter.update("loss", loss.item())
 
 

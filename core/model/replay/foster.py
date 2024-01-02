@@ -24,7 +24,7 @@ class FOSTER(Finetune):
         self._snet = None
         self.beta1 = args["beta1"]
         self.beta2 = args["beta2"]
-        # todo (FOSTER) add methods to update per_cls_weights
+
         self.per_cls_weights = None
         self.is_teacher_wa = args["is_teacher_wa"]
         self.is_student_wa = args["is_student_wa"]
@@ -118,7 +118,6 @@ class FOSTER(Finetune):
             print("per cls weights : {}".format(per_cls_weights))
             self.per_cls_weights = torch.FloatTensor(per_cls_weights).to(self._device)
 
-            #todo (FOSTER) fix concat bugs
             merged_loaders = list(chain.from_iterable(test_loaders))
             self._feature_compression(train_loader, merged_loaders)
         # else:
@@ -149,19 +148,6 @@ class FOSTER(Finetune):
                 logits[:, : self._known_classes], old_logits, self.args["T"]
             )
             loss = loss_clf + loss_fe + loss_kd
-            # optimizer.zero_grad()
-            # loss.backward()
-            # todo(FOSTER) 没有进行backward
-            # if self.oofc == "az":
-            #     for i, p in enumerate(self._network_module_ptr.fc.parameters()):
-            #         if i == 0:
-            #             p.grad.data[
-            #             self._known_classes:,
-            #             : self._network_module_ptr.out_dim,
-            #             ] = torch.tensor(0.0)
-            # elif self.oofc != "ft":
-            #     assert 0, "not implemented"
-            # optimizer.step()
             _, preds = torch.max(logits, dim=1)
             correct += preds.eq(targets.expand_as(preds)).cpu().sum()
             total += len(targets)
